@@ -1,19 +1,15 @@
 <?php
-session_start();
-if (!isset($_SESSION['user'])) {
-    header('Location: index.php');
-    exit;
-}
-$user = $_SESSION['user'];
-?>
-<!DOCTYPE html>
-<html>
-<head><title>User Dashboard</title></head>
-<body>
-    <h2>User Details</h2>
-    <pre><?php print_r($user['claims']); ?></pre>
-    <h3>ID Token</h3>
-    <pre><?php echo $user['id_token']; ?></pre>
-    <a href="index.php">Logout</a>
-</body>
-</html>
+require_once __DIR__ . '/../lib/oidc.php';
+start_azure_safe_session();
+ensure_authenticated();
+
+$env = parse_ini_file(__DIR__ . '/../.env');
+$email = $_SESSION['email'] ?? 'onbekend';
+$name = $_SESSION['name'] ?? 'gebruiker';
+$roles = $_SESSION['roles'] ?? [];
+
+echo "<h1>Welkom, " . htmlspecialchars($name) . "</h1>";
+echo "<p>E-mail: " . htmlspecialchars($email) . "</p>";
+echo "<p>Rollen: <pre>" . print_r($roles, true) . "</pre></p>";
+echo "<p><a href='/download.php?file=test.pdf'>Test download</a></p>";
+echo "<p><a href='/debug.php'>Debug info</a></p>";

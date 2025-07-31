@@ -1,14 +1,9 @@
 <?php
+// File: index.php
 session_start();
 require 'vendor/autoload.php'; // Composer autoload for OIDC library
 
-$env = [];
-// Load .env variables
-if (file_exists(__DIR__ . '/.env')) {
-    $env = parse_ini_file(__DIR__ . '/.env');
-} else {
-    die('Missing .env file');
-}
+$env = parse_ini_file(__DIR__ . '/.env');
 
 $provider_url = 'https://login.microsoftonline.com/' . $env['TENANT_ID'] . '/v2.0';
 $oidc = new Jumbojett\OpenIDConnectClient(
@@ -35,9 +30,16 @@ if (isset($_GET['login'])) {
 ?>
 <!DOCTYPE html>
 <html>
-<head><title>Login</title></head>
+<head>
+    <title>Login</title>
+    <link rel="stylesheet" href="style.css">
+</head>
 <body>
-    <h2>PHP OIDC Demo</h2>
-    <a href="?login=1">Login with OIDC</a>
+    <h2>Welcome to S-Cape Travel Portal</h2>
+    <div class="link-block">
+        <a class="button" href="?login=1">Login with Microsoft</a><br>
+        <a class="button" href="register_customer.php">Register as Customer</a><br>
+        <a class="button" href="register_agent.php">Register as Agent</a>
+    </div>
 </body>
 </html>

@@ -1,13 +1,9 @@
 <?php
+// File: callback.php
 session_start();
 require 'vendor/autoload.php';
 
-// Load .env variables
-if (file_exists(__DIR__ . '/.env')) {
-    $env = parse_ini_file(__DIR__ . '/.env');
-} else {
-    die('Missing .env file');
-}
+$env = parse_ini_file(__DIR__ . '/.env');
 
 $provider_url = 'https://login.microsoftonline.com/' . $env['TENANT_ID'] . '/v2.0';
 $oidc = new Jumbojett\OpenIDConnectClient(

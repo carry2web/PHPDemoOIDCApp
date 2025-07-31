@@ -1,0 +1,79 @@
+/* File: style.css */
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-color: #f7f9fb;
+    color: #333;
+    margin: 0;
+    padding: 2em;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+h2 {
+    color: #2c3e50;
+    margin-bottom: 1em;
+}
+
+.link-block {
+    display: flex;
+    flex-direction: column;
+    gap: 1em;
+    align-items: center;
+}
+
+.button {
+    display: inline-block;
+    padding: 0.75em 1.5em;
+    font-size: 1em;
+    font-weight: 600;
+    color: #fff;
+    background-color: #0078D4;
+    border: none;
+    border-radius: 6px;
+    text-decoration: none;
+    transition: background-color 0.2s ease-in-out;
+}
+
+.button:hover {
+    background-color: #005ea6;
+}
+
+form {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    max-width: 400px;
+    gap: 1em;
+    background: #fff;
+    padding: 2em;
+    border-radius: 8px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+}
+
+label {
+    font-weight: 600;
+}
+
+input[type="email"],
+textarea {
+    padding: 0.75em;
+    font-size: 1em;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    width: 100%;
+}
+
+input[type="submit"] {
+    background-color: #0078D4;
+    color: white;
+    border: none;
+    padding: 0.75em;
+    border-radius: 6px;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+input[type="submit"]:hover {
+    background-color: #005ea6;
+}
