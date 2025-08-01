@@ -330,7 +330,7 @@ class EmailNotificationService {
                         <tr><td class='label'>Name:</td><td>" . htmlspecialchars($name) . "</td></tr>
                         <tr><td class='label'>Email:</td><td>" . htmlspecialchars($email) . "</td></tr>
                         <tr><td class='label'>Company:</td><td>" . htmlspecialchars($company) . "</td></tr>
-                        <tr><td class='label'>Submitted:</td><td>" . date('F j, Y \a\t g:i A') . "</td></tr>
+                        <tr><td class='label'>Submitted:</td><td>" . date('F j, Y \\a\\t g:i A') . "</td></tr>
                     </table>
                     
                     <h3>Business Reason:</h3>
