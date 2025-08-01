@@ -242,11 +242,14 @@ class ScapeLogger {
     }
     
     private function getCurrentUserId() {
-        // Get current user ID from session
-        if (isset($_SESSION['user_info']['sub'])) {
-            return $_SESSION['user_info']['sub'];
-        } elseif (isset($_SESSION['user_info']['email'])) {
-            return $_SESSION['user_info']['email'];
+        // Get current user ID from session (OIDC format)
+        if (isset($_SESSION['email'])) {
+            return $_SESSION['email'];
+        } elseif (isset($_SESSION['claims'])) {
+            $claims = json_decode($_SESSION['claims'], true);
+            if (isset($claims['sub'])) {
+                return $claims['sub'];
+            }
         }
         return 'anonymous';
     }
