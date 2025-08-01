@@ -50,19 +50,17 @@ function start_authentication($userType) {
         $_SESSION['auth_user_type'] = $userType;
         
         if ($userType === 'customer') {
-            // B2C Configuration for customers (Microsoft External ID)
-            $tenantName = $config['b2c']['tenant_name'];
-            $policy = $config['b2c']['policy_signup_signin'];
-            // External ID uses policy-specific authority format
-            $authority = "https://$tenantName.ciamlogin.com/$tenantName.onmicrosoft.com/$policy/v2.0";
+            // Microsoft Entra External ID configuration
+            $tenantId = $config['b2c']['tenant_id'];
+            // External ID uses standard Microsoft identity platform v2.0 endpoint
+            $authority = "https://login.microsoftonline.com/$tenantId/v2.0";
             $clientId = $config['b2c']['client_id'];
             $clientSecret = $config['b2c']['client_secret'];
             
             $logger->debug('External ID configuration', [
                 'authority' => $authority,
                 'client_id' => $clientId,
-                'tenant_name' => $tenantName,
-                'policy' => $policy
+                'tenant_id' => $tenantId
             ]);
         } else {
             // B2B Configuration for agents/employees
@@ -118,10 +116,9 @@ function handle_authentication_callback() {
         $config = get_app_config();
         
         if ($userType === 'customer') {
-            $tenantName = $config['b2c']['tenant_name'];
-            $policy = $config['b2c']['policy_signup_signin'];
-            // External ID uses policy-specific authority format
-            $authority = "https://$tenantName.ciamlogin.com/$tenantName.onmicrosoft.com/$policy/v2.0";
+            $tenantId = $config['b2c']['tenant_id'];
+            // External ID uses standard Microsoft identity platform v2.0 endpoint
+            $authority = "https://login.microsoftonline.com/$tenantId/v2.0";
             $clientId = $config['b2c']['client_id'];
             $clientSecret = $config['b2c']['client_secret'];
         } else {
