@@ -1,73 +1,35 @@
-name: Deploy S-Cape Travel to Azure Web App
+name: Deploy to Azure Web App
 
 on:
   push:
-    branches:
-      - main
-  pull_request:
-    branches:
-      - main
+    branches: [ main ]
+  workflow_dispatch:
 
 env:
   AZURE_WEBAPP_NAME: scapecustomers-hvhpchb9hwc6e5cb
-  AZURE_WEBAPP_PACKAGE_PATH: '.'
   PHP_VERSION: '8.2'
 
 jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
-    
+
     steps:
-    - name: 🛒 Checkout code
-      uses: actions/checkout@v4
-      
-    - name: 🐘 Setup PHP
+    - uses: actions/checkout@v4
+
+    - name: Setup PHP
       uses: shivammathur/setup-php@v2
       with:
         php-version: ${{ env.PHP_VERSION }}
-        extensions: mbstring, xml, ctype, iconv, intl, pdo, pdo_mysql, dom, filter, gd, json, zip, curl
-        
-    - name: 🔍 Validate composer.json and composer.lock
+
+    - name: Check composer
       run: composer validate --strict
-      
-    - name: 📦 Install Composer dependencies
+
+    - name: Install dependencies
       run: composer install --prefer-dist --no-progress --no-dev --optimize-autoloader
-      
-    - name: 🧪 Run basic PHP syntax check
-      run: find . -name "*.php" -not -path "./vendor/*" -exec php -l {} \;
-      
-    - name: 📁 Create deployment package
-      run: |
-        # Remove development files
-        rm -rf .git
-        rm -rf .github
-        rm -rf tests
-        rm -f .gitignore
-        rm -f README.md
-        rm -f composer.lock
-        
-        # Create zip package
-        zip -r deployment.zip . -x "*.git*" "node_modules/*" "tests/*"
-        
-    - name: 🚀 Deploy to Azure Web App
-      uses: azure/webapps-deploy@v2
+
+    - name: Deploy to Azure Web App
+      uses: azure/webapps-deploy@v3
       with:
         app-name: ${{ env.AZURE_WEBAPP_NAME }}
         publish-profile: ${{ secrets.AZURE_WEBAPP_PUBLISH_PROFILE }}
-        package: deployment.zip
-        
-    - name: 🎯 Post-deployment health check
-      run: |
-        echo "Waiting for deployment to complete..."
-        sleep 30
-        
-        # Test if the application is responding
-        HTTP_STATUS=$(curl -s -o /dev/null -w "%{http_code}" https://${{ env.AZURE_WEBAPP_NAME }}.azurewebsites.net/debug_azure.php || echo "000")
-        
-        if [ "$HTTP_STATUS" == "200" ]; then
-          echo "✅ Application deployed successfully and responding"
-        else
-          echo "❌ Application deployment may have issues (HTTP: $HTTP_STATUS)"
-          echo "Check Azure Web App logs for details"
-          exit 1
-        fi
+        package: .
