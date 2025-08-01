@@ -154,6 +154,9 @@ function start_authentication($userType) {
             'provider_url' => $oidc->getProviderURL()
         ]);
         
+        // Clear any output buffering to ensure redirect works
+        if (ob_get_length()) ob_end_clean();
+        
         // This should redirect to Microsoft
         $logger->info('Calling OIDC authenticate - should redirect');
         $oidc->authenticate();

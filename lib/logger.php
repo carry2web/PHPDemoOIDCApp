@@ -31,17 +31,20 @@ class ScapeLogger {
     }
     
     private function setupLoggers() {
-        // Ensure data directory exists
-        $dataDir = __DIR__ . '/../data';
-        if (!is_dir($dataDir)) {
-            mkdir($dataDir, 0755, true);
+        // Use /tmp for Azure Web Apps compatibility, fallback to data directory
+        $logDir = '/tmp';
+        if (!is_writable($logDir)) {
+            $logDir = __DIR__ . '/../data';
+            if (!is_dir($logDir)) {
+                mkdir($logDir, 0755, true);
+            }
         }
         
         // Main application logger
         $this->logger = new Logger('scape_app');
         
         // Use rotating file handler to prevent huge log files
-        $mainHandler = new RotatingFileHandler($dataDir . '/app.log', 30, Logger::DEBUG);
+        $mainHandler = new RotatingFileHandler($logDir . '/app.log', 30, Logger::DEBUG);
         $mainHandler->setFormatter(new LineFormatter(
             "[%datetime%] %level_name% %channel%: %message% %context%\n",
             'Y-m-d H:i:s'
@@ -51,7 +54,7 @@ class ScapeLogger {
         
         // Error logger for PHP errors/exceptions
         $this->errorLogger = new Logger('php_errors');
-        $errorHandler = new RotatingFileHandler($dataDir . '/error.log', 30, Logger::WARNING);
+        $errorHandler = new RotatingFileHandler($logDir . '/error.log', 30, Logger::WARNING);
         $errorHandler->setFormatter(new LineFormatter(
             "[%datetime%] %level_name%: %message% %context%\n",
             'Y-m-d H:i:s'
@@ -60,7 +63,7 @@ class ScapeLogger {
         
         // Debug logger for detailed debugging
         $this->debugLogger = new Logger('debug');
-        $debugHandler = new RotatingFileHandler($dataDir . '/debug.log', 7, Logger::DEBUG);
+        $debugHandler = new RotatingFileHandler($logDir . '/debug.log', 7, Logger::DEBUG);
         $debugHandler->setFormatter(new LineFormatter(
             "[%datetime%] %level_name%: %message% %context%\n",
             'Y-m-d H:i:s'
