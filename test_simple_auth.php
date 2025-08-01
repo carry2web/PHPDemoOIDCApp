@@ -27,11 +27,16 @@ echo "<h2>2. OIDC Client Test</h2>";
 try {
     $oidcCustomer = get_oidc_client('customer');
     echo "✅ Customer OIDC client created<br>";
+    echo "Customer Provider URL: " . $oidcCustomer->getProviderURL() . "<br>";
+    echo "Customer Redirect URL: " . $oidcCustomer->getRedirectURL() . "<br>";
     
     $oidcAgent = get_oidc_client('agent');
     echo "✅ Agent OIDC client created<br>";
+    echo "Agent Provider URL: " . $oidcAgent->getProviderURL() . "<br>";
+    echo "Agent Redirect URL: " . $oidcAgent->getRedirectURL() . "<br>";
 } catch (Exception $e) {
     echo "❌ OIDC client error: " . $e->getMessage() . "<br>";
+    echo "Error details: " . $e->getFile() . " line " . $e->getLine() . "<br>";
 }
 
 echo "<h2>3. Test Authentication</h2>";
