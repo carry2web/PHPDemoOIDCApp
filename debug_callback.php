@@ -39,8 +39,8 @@ try {
     echo "Config loaded successfully\n";
     
     if ($userType === 'customer') {
-        $tenantName = $config['b2c']['tenant_name'];
-        $authority = "https://login.microsoftonline.com/$tenantName.onmicrosoft.com/v2.0";
+        $tenantId = $config['b2c']['tenant_id'];
+        $authority = "https://login.microsoftonline.com/$tenantId/v2.0";
         $clientId = $config['b2c']['client_id'];
         $clientSecret = $config['b2c']['client_secret'];
     } else {

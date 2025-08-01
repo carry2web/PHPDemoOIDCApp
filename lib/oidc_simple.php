@@ -140,7 +140,17 @@ function handle_authentication_callback() {
             $oidc->addScope(["https://graph.microsoft.com/User.Read"]);
         }
         
-        if ($oidc->authenticate()) {
+        $logger->debug('About to call OIDC authenticate', [
+            'authority' => $authority,
+            'client_id' => $clientId,
+            'redirect_uri' => $config['app']['redirect_uri'],
+            'user_type' => $userType
+        ]);
+
+        $authResult = $oidc->authenticate();
+        $logger->debug('OIDC authenticate returned', ['result' => $authResult]);
+
+        if ($authResult) {
             $claims = $oidc->getVerifiedClaims();
             
             $logger->info('Authentication successful', [
@@ -167,6 +177,14 @@ function handle_authentication_callback() {
             ]);
             
             return true;
+        } else {
+            $logger->error('OIDC authenticate returned false', [
+                'user_type' => $userType,
+                'authority' => $authority,
+                'GET_params' => $_GET,
+                'POST_params' => $_POST,
+                'session_auth_user_type' => $_SESSION['auth_user_type'] ?? 'not_set'
+            ]);
         }
         
         return false;
