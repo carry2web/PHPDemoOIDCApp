@@ -14,8 +14,8 @@ try {
     echo "<!-- Debug: Starting index_debug.php -->\n";
     
     // Check if main files exist
-    if (!file_exists(__DIR__ . '/lib/oidc_simple.php')) {
-        throw new Exception('Critical file missing: lib/oidc_simple.php');
+    if (!file_exists(__DIR__ . '/lib/oidc.php')) {
+        throw new Exception('Critical file missing: lib/oidc.php');
     }
     
     if (!file_exists(__DIR__ . '/lib/logger.php')) {
@@ -23,7 +23,7 @@ try {
     }
     
     echo "<!-- Debug: Including core libraries -->\n";
-    require_once __DIR__ . '/lib/oidc_simple.php';
+    require_once __DIR__ . '/lib/oidc.php';
     require_once __DIR__ . '/lib/logger.php';
     
     echo "<!-- Debug: Initializing logger -->\n";

@@ -1,7 +1,7 @@
 <?php
 // File: index.php
 // Updated: GitHub Actions deployment configured
-require_once __DIR__ . '/lib/oidc_simple.php';
+require_once __DIR__ . '/lib/oidc.php';
 require_once __DIR__ . '/lib/logger.php';
 
 // Enable error reporting for debugging

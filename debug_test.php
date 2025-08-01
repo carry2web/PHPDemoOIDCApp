@@ -32,9 +32,9 @@ try {
     $scapeLogger->info('Test message from debug page');
     echo "✅ ScapeLogger test message sent<br>";
     
-    echo "<h2>Testing OIDC Simple</h2>";
-    require_once __DIR__ . '/lib/oidc_simple.php';
-    echo "✅ OIDC Simple loaded<br>";
+    echo "<h2>Testing OIDC</h2>";
+    require_once __DIR__ . '/lib/oidc.php';
+    echo "✅ OIDC loaded<br>";
     
 } catch (Exception $e) {
     echo "<h2>❌ ERROR</h2>";

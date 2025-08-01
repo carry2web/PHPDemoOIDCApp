@@ -1,6 +1,6 @@
 <?php
 // File: callback.php
-require_once __DIR__ . '/lib/oidc_simple.php';
+require_once __DIR__ . '/lib/oidc.php';
 require_once __DIR__ . '/lib/logger.php';
 
 // Enable error reporting for debugging

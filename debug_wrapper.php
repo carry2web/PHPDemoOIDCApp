@@ -65,7 +65,7 @@ function show_debug_info($error = null) {
     echo "<h2>📁 File Check</h2>";
     $criticalFiles = [
         'lib/config_helper.php',
-        'lib/oidc_simple.php',
+        'lib/oidc.php',
         'lib/logger.php',
         'vendor/autoload.php'
     ];

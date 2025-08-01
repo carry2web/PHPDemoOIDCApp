@@ -46,7 +46,7 @@ $checkFiles = [
     'callback.php', 
     'dashboard.php',
     'lib/config_helper.php',
-    'lib/oidc_simple.php',
+    'lib/oidc.php',
     'lib/logger.php',
     '.env'
 ];

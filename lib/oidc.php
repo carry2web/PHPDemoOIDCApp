@@ -67,9 +67,8 @@ function get_oidc_client($userType = null) {
     } else {
         // External tenant for customers (Microsoft External ID)
         $clientConfig = $config['b2c'];
-        // Following Woodgrove External ID pattern - use tenant.onmicrosoft.com format
-        $tenantName = $clientConfig['tenant_name'];
-        $authority = "https://login.microsoftonline.com/$tenantName.onmicrosoft.com/v2.0";
+        // External ID uses standard Microsoft identity platform v2.0 endpoint
+        $authority = "https://login.microsoftonline.com/{$clientConfig['tenant_id']}/v2.0";
     }
 
     $oidc = new OpenIDConnectClient(
@@ -128,4 +127,99 @@ function is_scape_employee($claims, $userType) {
     
     $userTypeInClaims = $claims->userType ?? 'Member';
     return $userTypeInClaims === 'Member';
+}
+
+/**
+ * Start authentication flow
+ */
+function start_authentication($userType) {
+    $logger = ScapeLogger::getInstance();
+    
+    try {
+        $logger->info('Starting authentication flow', ['user_type' => $userType]);
+        $config = get_app_config();
+        
+        $_SESSION['auth_user_type'] = $userType;
+        
+        $oidc = get_oidc_client($userType);
+        
+        $logger->info('Starting OIDC authentication');
+        $oidc->authenticate();
+        
+    } catch (Exception $e) {
+        $logger->error('Authentication start failed', [
+            'user_type' => $userType,
+            'error' => $e->getMessage(),
+            'trace' => $e->getTraceAsString()
+        ]);
+        
+        header('Location: /index.php?error=' . urlencode($e->getMessage()));
+        exit;
+    }
+}
+
+/**
+ * Handle authentication callback
+ */
+function handle_authentication_callback() {
+    $logger = ScapeLogger::getInstance();
+    
+    try {
+        $userType = $_SESSION['auth_user_type'] ?? 'customer';
+        $logger->info('Handling authentication callback', ['user_type' => $userType]);
+        
+        $oidc = get_oidc_client($userType);
+        
+        $logger->debug('About to call OIDC authenticate', [
+            'user_type' => $userType
+        ]);
+
+        $authResult = $oidc->authenticate();
+        $logger->debug('OIDC authenticate returned', ['result' => $authResult]);
+
+        if ($authResult) {
+            $claims = $oidc->getVerifiedClaims();
+            
+            $logger->info('Authentication successful', [
+                'user_type' => $userType,
+                'email' => $claims->email ?? 'unknown',
+                'name' => $claims->name ?? 'unknown'
+            ]);
+            
+            // Store user session data
+            $_SESSION['email'] = $claims->email ?? '';
+            $_SESSION['name'] = $claims->name ?? '';
+            $_SESSION['user_type'] = $userType;
+            $_SESSION['claims'] = json_encode($claims);
+            $_SESSION['authenticated_at'] = time();
+            
+            // Determine user role
+            $role = get_user_role($claims, $userType);
+            $_SESSION['role'] = $role;
+            
+            $logger->info('User session established', [
+                'email' => $_SESSION['email'],
+                'role' => $role,
+                'user_type' => $userType
+            ]);
+            
+            return true;
+        } else {
+            $logger->error('OIDC authenticate returned false', [
+                'user_type' => $userType,
+                'GET_params' => $_GET,
+                'POST_params' => $_POST,
+                'session_auth_user_type' => $_SESSION['auth_user_type'] ?? 'not_set'
+            ]);
+        }
+        
+        return false;
+        
+    } catch (Exception $e) {
+        $logger->error('Authentication callback failed', [
+            'error' => $e->getMessage(),
+            'trace' => $e->getTraceAsString()
+        ]);
+        return false;
+    }
 }
