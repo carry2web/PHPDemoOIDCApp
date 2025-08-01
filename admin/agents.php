@@ -22,39 +22,30 @@ if (!empty($configErrors)) {
     die("System configuration error. Please check configuration.");
 }
 
-// Entra ID Admin Authentication (replaces password-based auth)
-if (!isset($_SESSION['email']) || !isset($_SESSION['authenticated_at'])) {
-    $logger->info('Admin panel access attempt - no OIDC authentication found');
-    header('Location: ../index.php?login=1&type=agent');
-    exit;
-}
+// Authentication using same pattern as dashboard.php
+start_azure_safe_session();
+ensure_authenticated();
+
+$email = $_SESSION['email'] ?? 'unknown';
+$name = $_SESSION['name'] ?? 'User';
+$userType = $_SESSION['user_type'] ?? 'customer';
+$userRole = $_SESSION['user_role'] ?? 'customer';
 
 // Check if user has admin/agent role
-$userType = $_SESSION['user_type'] ?? '';
-$userRole = $_SESSION['role'] ?? '';
-
 if ($userType !== 'agent' && $userRole !== 'admin') {
     $logger->warning('Admin panel access denied - insufficient privileges', [
         'user_type' => $userType,
         'role' => $userRole,
-        'email' => $_SESSION['email'] ?? 'unknown'
+        'email' => $email
     ]);
     die("Access denied. Admin privileges required.");
 }
 
-$_SESSION['admin_authenticated'] = true; // Set for compatibility
-$_SESSION['admin_user'] = [
-    'email' => $_SESSION['email'],
-    'name' => $_SESSION['name'] ?? '',
-    'roles' => [$userRole]
-];
-$logger->info('Admin panel access granted', ['email' => $_SESSION['email']]);
+$logger->info('Admin panel access granted', ['email' => $email]);
 
 // Check for logout
 if (isset($_POST['logout']) || isset($_GET['logout'])) {
-    $logger->info('Admin logout', ['user' => $_SESSION['admin_user']['email'] ?? 'unknown']);
-    unset($_SESSION['admin_authenticated']);
-    unset($_SESSION['admin_user']);
+    $logger->info('Admin logout', ['user' => $email]);
     session_destroy();
     header('Location: ../index.php');
     exit;
@@ -64,8 +55,7 @@ if (isset($_POST['logout']) || isset($_GET['logout'])) {
 $message = '';
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
     // Rate limiting for admin actions
-    $adminEmail = $_SESSION['admin_user']['email'] ?? 'unknown';
-    $rateLimitKey = 'admin_actions_' . $adminEmail;
+    $rateLimitKey = 'admin_actions_' . $email;
     
     if (!$security->checkRateLimit($rateLimitKey, 20, 300)) {
         $message = "⚠️ Too many admin actions. Please wait before trying again.";

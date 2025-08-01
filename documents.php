@@ -1,5 +1,5 @@
 <?php
-session_start();
+require_once __DIR__ . '/lib/oidc.php';
 require_once 'vendor/autoload.php';
 require_once 'lib/config_helper.php';
 require_once 'lib/document_manager.php';
@@ -9,19 +9,19 @@ require_once 'lib/security_helper.php';
 $logger = ScapeLogger::getInstance();
 $security = SecurityHelper::getInstance();
 
-// Check if user is logged in (check OIDC authentication)
-if (!isset($_SESSION['email']) || !isset($_SESSION['authenticated_at'])) {
-    header('Location: index.php?login=1&type=customer');
-    exit;
-}
+start_azure_safe_session();
+ensure_authenticated();
 
-// Create scape_user array from OIDC session for compatibility
+$email = $_SESSION['email'] ?? 'unknown';
+$name = $_SESSION['name'] ?? 'User';
+$userType = $_SESSION['user_type'] ?? 'customer'; // customer or agent
+
+// Create user array for backward compatibility
 $user = [
-    'email' => $_SESSION['email'],
-    'name' => $_SESSION['name'] ?? '',
-    'user_type' => $_SESSION['user_type'] ?? 'customer'
+    'email' => $email,
+    'name' => $name,
+    'user_type' => $userType
 ];
-$_SESSION['scape_user'] = $user; // Set for compatibility
 
 $userType = $user['user_type'];
 
