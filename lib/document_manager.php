@@ -29,13 +29,21 @@ class DocumentManager {
     }
     
     /**
-     * Upload a file to S3 based on user type
+     * Upload a file to S3 based on user type and permissions
      */
-    public function uploadDocument($userType, $fileName, $fileContent, $contentType = 'application/octet-stream') {
+    public function uploadDocument($userType, $fileName, $fileContent, $contentType = 'application/octet-stream', $user = null, $targetCustomer = null) {
         try {
-            // Determine folder based on user type
-            $folder = ($userType === 'customer') ? 'customers' : 'agents';
-            $key = "$folder/" . sanitize_filename($fileName);
+            // Determine upload permissions and target folder
+            $uploadTarget = $this->determineUploadTarget($userType, $user, $targetCustomer);
+            
+            if (!$uploadTarget['allowed']) {
+                return [
+                    'success' => false,
+                    'error' => $uploadTarget['error'] ?? 'Upload not permitted'
+                ];
+            }
+            
+            $key = $uploadTarget['folder'] . '/' . sanitize_filename($fileName);
             
             $result = $this->s3Client->putObject([
                 'Bucket' => $this->bucket,
@@ -44,14 +52,18 @@ class DocumentManager {
                 'ContentType' => $contentType,
                 'Metadata' => [
                     'uploaded-by' => $userType,
-                    'upload-date' => date('Y-m-d H:i:s')
+                    'uploaded-by-email' => $user['email'] ?? 'unknown',
+                    'upload-date' => date('Y-m-d H:i:s'),
+                    'target-customer' => $targetCustomer ?? 'self'
                 ]
             ]);
             
             $this->logger->info("Document uploaded successfully", [
                 'user_type' => $userType,
                 'key' => $key,
-                'etag' => $result['ETag']
+                'etag' => $result['ETag'],
+                'target_customer' => $targetCustomer,
+                'uploaded_by' => $user['email'] ?? 'unknown'
             ]);
             
             return [
@@ -76,32 +88,108 @@ class DocumentManager {
     }
     
     /**
-     * List documents for a user type
+     * Determine where a user can upload based on their role
      */
-    public function listDocuments($userType) {
+    private function determineUploadTarget($userType, $user, $targetCustomer = null) {
+        $userRole = $this->getUserRole($user);
+        
+        switch ($userRole) {
+            case 'customer':
+                // Customers can only upload to their own folder (but currently disabled)
+                return [
+                    'allowed' => false,
+                    'error' => 'Customers have read-only access. Contact your agent for document uploads.',
+                    'folder' => null
+                ];
+                
+            case 'agent':
+                // Agents can upload to any customer folder they manage
+                if ($targetCustomer) {
+                    // Upload to specific customer folder
+                    $customerFolder = "customers/" . sanitize_filename($targetCustomer);
+                    return [
+                        'allowed' => true,
+                        'folder' => $customerFolder
+                    ];
+                } else {
+                    // Default to agents folder
+                    return [
+                        'allowed' => true,
+                        'folder' => 'agents'
+                    ];
+                }
+                
+            case 'admin':
+                // Admins can upload anywhere
+                if ($targetCustomer) {
+                    $customerFolder = "customers/" . sanitize_filename($targetCustomer);
+                    return [
+                        'allowed' => true,
+                        'folder' => $customerFolder
+                    ];
+                } else {
+                    return [
+                        'allowed' => true,
+                        'folder' => $userType === 'customer' ? 'customers' : 'agents'
+                    ];
+                }
+                
+            default:
+                return [
+                    'allowed' => false,
+                    'error' => 'Unknown user role',
+                    'folder' => null
+                ];
+        }
+    }
+    
+    /**
+     * List documents based on user role and permissions
+     */
+    public function listDocuments($userType, $user = null) {
         try {
-            $folder = ($userType === 'customer') ? 'customers' : 'agents';
-            
-            $result = $this->s3Client->listObjectsV2([
-                'Bucket' => $this->bucket,
-                'Prefix' => "$folder/"
-            ]);
+            $userRole = $this->getUserRole($user);
+            $foldersToList = $this->getFoldersForUser($userRole, $userType, $user);
             
             $documents = [];
-            if (isset($result['Contents'])) {
-                foreach ($result['Contents'] as $object) {
-                    $documents[] = [
-                        'key' => $object['Key'],
-                        'size' => $object['Size'],
-                        'modified' => $object['LastModified']->format('Y-m-d H:i:s'),
-                        'download_url' => $this->generatePresignedUrl($object['Key'])
-                    ];
+            
+            foreach ($foldersToList as $folder) {
+                $result = $this->s3Client->listObjectsV2([
+                    'Bucket' => $this->bucket,
+                    'Prefix' => "$folder/"
+                ]);
+                
+                if (isset($result['Contents'])) {
+                    foreach ($result['Contents'] as $object) {
+                        // Skip folder markers (keys ending with /)
+                        if (substr($object['Key'], -1) === '/') {
+                            continue;
+                        }
+                        
+                        $documents[] = [
+                            'key' => $object['Key'],
+                            'folder' => $folder,
+                            'filename' => basename($object['Key']),
+                            'size' => $object['Size'],
+                            'modified' => $object['LastModified']->format('Y-m-d H:i:s'),
+                            'download_url' => $this->generatePresignedUrl($object['Key']),
+                            'can_delete' => $this->canUserDeleteFile($userRole, $object['Key'], $user)
+                        ];
+                    }
                 }
             }
             
+            // Sort documents by modified date (newest first)
+            usort($documents, function($a, $b) {
+                return strtotime($b['modified']) - strtotime($a['modified']);
+            });
+            
             return [
                 'success' => true,
-                'documents' => $documents
+                'documents' => $documents,
+                'folders' => $foldersToList,
+                'user_role' => $userRole,
+                'can_upload' => $this->canUserUpload($userRole)
             ];
             
         } catch (AwsException $e) {
@@ -114,6 +202,115 @@ class DocumentManager {
                 'success' => false,
                 'error' => $e->getMessage()
             ];
+        }
+    }
+    
+    /**
+     * Get folders that a user can access based on their role
+     */
+    private function getFoldersForUser($userRole, $userType, $user) {
+        switch ($userRole) {
+            case 'customer':
+                // Customers can only see their own folder
+                $customerEmail = $user['email'] ?? 'unknown';
+                $customerFolder = 'customers/' . sanitize_filename($customerEmail);
+                return [$customerFolder];
+                
+            case 'agent':
+                // Agents can see all customer folders they manage + their own agent folder
+                // For now, agents see all customer folders (relationship not implemented yet)
+                $folders = ['agents'];
+                
+                // Get all customer folders
+                $customerFolders = $this->getCustomerFolders();
+                return array_merge($folders, $customerFolders);
+                
+            case 'admin':
+                // Admins can see everything
+                $folders = ['agents'];
+                $customerFolders = $this->getCustomerFolders();
+                return array_merge($folders, $customerFolders);
+                
+            default:
+                return [];
+        }
+    }
+    
+    /**
+     * Get all customer folders from S3
+     */
+    private function getCustomerFolders() {
+        try {
+            $result = $this->s3Client->listObjectsV2([
+                'Bucket' => $this->bucket,
+                'Prefix' => 'customers/',
+                'Delimiter' => '/'
+            ]);
+            
+            $folders = [];
+            if (isset($result['CommonPrefixes'])) {
+                foreach ($result['CommonPrefixes'] as $prefix) {
+                    $folder = rtrim($prefix['Prefix'], '/');
+                    $folders[] = $folder;
+                }
+            }
+            
+            return $folders;
+            
+        } catch (AwsException $e) {
+            $this->logger->error("Failed to get customer folders", [
+                'error' => $e->getMessage()
+            ]);
+            return [];
+        }
+    }
+    
+    /**
+     * Determine user role from session data
+     */
+    private function getUserRole($user) {
+        if (!$user) {
+            return 'unknown';
+        }
+        
+        // Check for admin role (you can extend this logic)
+        if (isset($user['roles']) && in_array('admin', $user['roles'])) {
+            return 'admin';
+        }
+        
+        // Check explicit user_role
+        if (isset($user['user_role'])) {
+            return $user['user_role'];
+        }
+        
+        // Fallback to user_type
+        return $user['user_type'] ?? 'customer';
+    }
+    
+    /**
+     * Check if user can upload files
+     */
+    private function canUserUpload($userRole) {
+        return in_array($userRole, ['agent', 'admin']);
+    }
+    
+    /**
+     * Check if user can delete a specific file
+     */
+    private function canUserDeleteFile($userRole, $fileKey, $user) {
+        switch ($userRole) {
+            case 'customer':
+                return false; // Customers can't delete anything
+                
+            case 'agent':
+                // Agents can delete files they uploaded or files in customer folders they manage
+                return true; // For now, allow all deletions (refine later with relationships)
+                
+            case 'admin':
+                return true; // Admins can delete anything
+                
+            default:
+                return false;
         }
     }
     

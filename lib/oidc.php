@@ -204,27 +204,55 @@ function handle_authentication_callback() {
                 'name' => $claims->name ?? 'unknown'
             ]);
             
-            // Store user session data
+            // Store user session data with role determination
             $_SESSION['email'] = $claims->email ?? '';
             $_SESSION['name'] = $claims->name ?? '';
             $_SESSION['user_type'] = $userType;
             $_SESSION['claims'] = json_encode($claims);
             $_SESSION['authenticated_at'] = time();
             
-            // Set role variables that dashboard expects
-            $role = ($userType === 'agent') ? 'agent' : 'customer';
+            // Determine user role based on type and claims
+            $role = determineUserRole($userType, $claims);
             $_SESSION['user_role'] = $role; // Primary role variable
             
             // Set additional variables dashboard expects
-            $_SESSION['entra_user_type'] = 'Member'; // External ID users are always Members
-            $_SESSION['is_guest_agent'] = false; // Customers are never guest agents
-            $_SESSION['is_scape_employee'] = false; // Customers are never employees
-            $_SESSION['roles'] = []; // No specific roles for customers
+            $entraUserType = $claims->userType ?? 'Member';
+            $_SESSION['entra_user_type'] = $entraUserType;
+            $_SESSION['is_guest_agent'] = ($userType === 'agent' && $entraUserType === 'Guest');
+            $_SESSION['is_scape_employee'] = ($userType === 'agent' && $entraUserType === 'Member');
+            
+            // Set roles array for additional role checking
+            $roles = [];
+            if ($role === 'admin') {
+                $roles[] = 'admin';
+            }
+            if ($userType === 'agent' || $role === 'agent') {
+                $roles[] = 'agent';
+            }
+            
+            // Add Entra ID roles to session
+            $entraRoles = [];
+            $roleClaimNames = ['roles', 'groups', 'extension_roles', 'wids'];
+            foreach ($roleClaimNames as $claimName) {
+                if (isset($claims->$claimName)) {
+                    $roleValue = $claims->$claimName;
+                    if (is_array($roleValue)) {
+                        $entraRoles = array_merge($entraRoles, $roleValue);
+                    } else {
+                        $entraRoles[] = $roleValue;
+                    }
+                }
+            }
+            
+            $_SESSION['roles'] = $roles;
+            $_SESSION['entra_roles'] = $entraRoles; // Store actual Entra roles
             $_SESSION['id_token'] = ''; // Not needed for basic flow
             
             $logger->info('User session created', [
                 'email' => $_SESSION['email'],
-                'role' => $role
+                'role' => $role,
+                'user_type' => $userType,
+                'entra_user_type' => $_SESSION['entra_user_type']
             ]);
             
             return true;
@@ -239,5 +267,94 @@ function handle_authentication_callback() {
             'line' => $e->getLine()
         ]);
         return false;
+    }
+}
+
+/**
+ * Determine user role based on Entra ID claims and user type
+ */
+function determineUserRole($userType, $claims) {
+    $logger = ScapeLogger::getInstance();
+    
+    // Log all available claims for debugging
+    $logger->debug('Available claims for role determination', [
+        'user_type' => $userType,
+        'claims' => json_encode($claims, JSON_PRETTY_PRINT)
+    ]);
+    
+    // Check for Entra ID roles in claims
+    $entraRoles = [];
+    
+    // Common Entra ID role claim names to check
+    $roleClaimNames = [
+        'roles',           // Application roles
+        'groups',          // Security groups
+        'extension_roles', // Custom extension attributes
+        'wids'            // Well-known IDs for directory roles
+    ];
+    
+    foreach ($roleClaimNames as $claimName) {
+        if (isset($claims->$claimName)) {
+            $roleValue = $claims->$claimName;
+            if (is_array($roleValue)) {
+                $entraRoles = array_merge($entraRoles, $roleValue);
+            } else {
+                $entraRoles[] = $roleValue;
+            }
+        }
+    }
+    
+    $logger->info('Entra roles found', [
+        'user_type' => $userType,
+        'email' => $claims->email ?? 'unknown',
+        'entra_roles' => $entraRoles
+    ]);
+    
+    // Check for admin roles (customize these role names based on your Entra ID setup)
+    $adminRoleNames = [
+        'Global Administrator',
+        'Application Administrator', 
+        'Admin',
+        'Administrator',
+        'Travel Admin',
+        'System Admin'
+    ];
+    
+    foreach ($adminRoleNames as $adminRole) {
+        if (in_array($adminRole, $entraRoles)) {
+            $logger->info('Admin role detected', [
+                'user_type' => $userType,
+                'email' => $claims->email ?? 'unknown',
+                'admin_role' => $adminRole
+            ]);
+            return 'admin';
+        }
+    }
+    
+    // Check for agent roles  
+    $agentRoleNames = [
+        'Travel Agent',
+        'Partner Agent',
+        'Agent',
+        'Sales Agent',
+        'Customer Service'
+    ];
+    
+    foreach ($agentRoleNames as $agentRole) {
+        if (in_array($agentRole, $entraRoles)) {
+            $logger->info('Agent role detected from Entra', [
+                'user_type' => $userType,
+                'email' => $claims->email ?? 'unknown',
+                'agent_role' => $agentRole
+            ]);
+            return 'agent';
+        }
+    }
+    
+    // Fallback to user type if no specific roles found
+    if ($userType === 'agent') {
+        return 'agent';
+    } else {
+        return 'customer';
     }
 }

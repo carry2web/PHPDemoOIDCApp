@@ -90,11 +90,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                             $docManager = new DocumentManager();
                             $fileContent = file_get_contents($fileValidation['tmp_name']);
                             
+                            // Get target customer if specified (for agents/admins)
+                            $targetCustomer = $_POST['target_customer'] ?? null;
+                            
                             $uploadResult = $docManager->uploadDocument(
                                 $userType, 
                                 $fileValidation['filename'], 
                                 $fileContent, 
-                                $fileValidation['mime_type']
+                                $fileValidation['mime_type'],
+                                $user,
+                                $targetCustomer
                             );
                             
                             $logger->info("Document upload attempt", [
@@ -103,6 +108,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                 'filename' => $fileValidation['filename'],
                                 'original_filename' => $fileValidation['original_filename'],
                                 'size' => $fileValidation['size'],
+                                'target_customer' => $targetCustomer,
                                 'success' => $uploadResult['success']
                             ]);
                         } else {
@@ -151,12 +157,50 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             }
         }
     }
+    
+    // Implement POST-Redirect-GET pattern to prevent white screen on refresh
+    if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+        $redirectUrl = $_SERVER['REQUEST_URI'];
+        
+        // Add result parameters to URL for display
+        if ($uploadResult && $uploadResult['success']) {
+            $redirectUrl .= (strpos($redirectUrl, '?') !== false ? '&' : '?') . 'upload=success';
+        } elseif ($uploadResult && !$uploadResult['success']) {
+            $redirectUrl .= (strpos($redirectUrl, '?') !== false ? '&' : '?') . 'upload=error&msg=' . urlencode($uploadResult['error']);
+        }
+        
+        if ($deleteResult && $deleteResult['success']) {
+            $redirectUrl .= (strpos($redirectUrl, '?') !== false ? '&' : '?') . 'delete=success';
+        } elseif ($deleteResult && !$deleteResult['success']) {
+            $redirectUrl .= (strpos($redirectUrl, '?') !== false ? '&' : '?') . 'delete=error&msg=' . urlencode($deleteResult['error']);
+        }
+        
+        header("Location: $redirectUrl");
+        exit;
+    }
 }
 
-// Get document list
+// Handle GET parameters from redirect
+if (isset($_GET['upload'])) {
+    if ($_GET['upload'] === 'success') {
+        $uploadResult = ['success' => true, 'message' => 'Document uploaded successfully'];
+    } elseif ($_GET['upload'] === 'error') {
+        $uploadResult = ['success' => false, 'error' => $_GET['msg'] ?? 'Upload failed'];
+    }
+}
+
+if (isset($_GET['delete'])) {
+    if ($_GET['delete'] === 'success') {
+        $deleteResult = ['success' => true, 'message' => 'Document deleted successfully'];
+    } elseif ($_GET['delete'] === 'error') {
+        $deleteResult = ['success' => false, 'error' => $_GET['msg'] ?? 'Delete failed'];
+    }
+}
+
+// Get document list based on user role and permissions
 if (DocumentManager::isConfigured()) {
     $docManager = new DocumentManager();
-    $listResult = $docManager->listDocuments($userType);
+    $listResult = $docManager->listDocuments($userType, $user);
 }
 ?>
 <!DOCTYPE html>
@@ -273,17 +317,58 @@ if (DocumentManager::isConfigured()) {
         <div class="card">
             <h2>📤 Upload Document</h2>
             <?php if (DocumentManager::isConfigured()): ?>
-                <form method="post" enctype="multipart/form-data">
-                    <?= csrf_input() ?>
-                    <input type="hidden" name="action" value="upload">
-                    <div class="upload-area">
-                        <input type="file" name="document" required accept=".pdf,.doc,.docx,.txt,.jpg,.jpeg,.png,.gif,.xls,.xlsx">
-                        <br><br>
-                        <button type="submit" class="btn btn-primary">📤 Upload Document</button>
+                <?php 
+                $userRole = $listResult['user_role'] ?? 'customer';
+                $canUpload = $listResult['can_upload'] ?? false;
+                ?>
+                
+                <?php if ($canUpload): ?>
+                    <form method="post" enctype="multipart/form-data">
+                        <?= csrf_input() ?>
+                        <input type="hidden" name="action" value="upload">
+                        
+                        <?php if ($userRole === 'agent' || $userRole === 'admin'): ?>
+                            <div style="margin-bottom: 15px;">
+                                <label for="target_customer"><strong>📁 Upload to folder:</strong></label><br>
+                                <select name="target_customer" id="target_customer" style="padding: 8px; width: 100%; max-width: 400px;">
+                                    <option value="">📂 My Agent Folder (agents/)</option>
+                                    <?php 
+                                    // Get available customer folders
+                                    if (isset($listResult['folders'])) {
+                                        foreach ($listResult['folders'] as $folder) {
+                                            if (strpos($folder, 'customers/') === 0) {
+                                                $customerName = substr($folder, 10); // Remove 'customers/' prefix
+                                                echo '<option value="' . htmlspecialchars($customerName) . '">👤 Customer: ' . htmlspecialchars($customerName) . '</option>';
+                                            }
+                                        }
+                                    }
+                                    ?>
+                                </select>
+                                <small style="display: block; margin-top: 5px; color: #666;">
+                                    <?php if ($userRole === 'agent'): ?>
+                                        As an agent, you can upload to customer folders you manage.
+                                    <?php else: ?>
+                                        As an admin, you can upload to any folder.
+                                    <?php endif; ?>
+                                </small>
+                            </div>
+                        <?php endif; ?>
+                        
+                        <div class="upload-area">
+                            <input type="file" name="document" required accept=".pdf,.doc,.docx,.txt,.jpg,.jpeg,.png,.gif,.xls,.xlsx">
+                            <br><br>
+                            <button type="submit" class="btn btn-primary">📤 Upload Document</button>
+                        </div>
+                    </form>
+                    <p><strong>Supported formats:</strong> PDF, DOC, DOCX, TXT, JPG, PNG, GIF, XLS, XLSX (Max 15MB)</p>
+                    <p><strong>Security:</strong> All files are scanned for malicious content before upload.</p>
+                <?php else: ?>
+                    <div class="upload-area" style="background: #f8d7da; border-color: #dc3545;">
+                        <p><strong>📖 Read-Only Access</strong></p>
+                        <p>Customers have read-only access to their documents.</p>
+                        <p>Contact your agent for document uploads or modifications.</p>
                     </div>
-                </form>
-                <p><strong>Supported formats:</strong> PDF, DOC, DOCX, TXT, JPG, PNG, GIF, XLS, XLSX (Max 15MB)</p>
-                <p><strong>Security:</strong> All files are scanned for malicious content before upload.</p>
+                <?php endif; ?>
             <?php else: ?>
                 <div class="upload-area">
                     <p>📋 Upload functionality requires AWS configuration</p>
@@ -293,35 +378,89 @@ if (DocumentManager::isConfigured()) {
         </div>
 
         <div class="card">
-            <h2>📂 Your Documents</h2>
+            <h2>📂 Document Access</h2>
             <?php if (DocumentManager::isConfigured() && $listResult && $listResult['success']): ?>
+                <?php 
+                $userRole = $listResult['user_role'] ?? 'customer';
+                ?>
+                
+                <div style="background: #e7f3ff; padding: 15px; border-radius: 4px; margin-bottom: 20px;">
+                    <strong>🔐 Access Level:</strong> 
+                    <?php if ($userRole === 'customer'): ?>
+                        <span style="color: #0066cc;">Customer (Read-Only)</span> - You can view and download your documents
+                    <?php elseif ($userRole === 'agent'): ?>
+                        <span style="color: #28a745;">Agent</span> - You can manage documents for your customers
+                    <?php elseif ($userRole === 'admin'): ?>
+                        <span style="color: #dc3545;">Administrator</span> - You have full access to all documents
+                    <?php endif; ?>
+                </div>
+                
                 <?php if (empty($listResult['documents'])): ?>
-                    <p>No documents found in your folder.</p>
+                    <p>📁 No documents found in accessible folders.</p>
+                    <?php if ($userRole === 'customer'): ?>
+                        <p><small>Your agent can upload documents to your folder which will appear here.</small></p>
+                    <?php endif; ?>
                 <?php else: ?>
-                    <div class="document-list">
-                        <?php foreach ($listResult['documents'] as $doc): ?>
-                            <div class="document-item">
-                                <div class="document-info">
-                                    <strong><?php echo htmlspecialchars(basename($doc['key'])); ?></strong><br>
-                                    <small>
-                                        Size: <?php echo number_format($doc['size'] / 1024, 1); ?> KB | 
-                                        Modified: <?php echo $doc['modified']; ?>
-                                    </small>
-                                </div>
-                                <div class="document-actions">
-                                    <a href="<?php echo htmlspecialchars($doc['download_url']); ?>" 
-                                       class="btn btn-success" target="_blank">📥 Download</a>
-                                    <form method="post" style="display: inline;" 
-                                          onsubmit="return confirm('Are you sure you want to delete this document?')">
-                                        <?= csrf_input() ?>
-                                        <input type="hidden" name="action" value="delete">
-                                        <input type="hidden" name="document_key" value="<?php echo htmlspecialchars($doc['key']); ?>">
-                                        <button type="submit" class="btn btn-danger">🗑️ Delete</button>
-                                    </form>
-                                </div>
+                    <?php 
+                    // Group documents by folder
+                    $documentsByFolder = [];
+                    foreach ($listResult['documents'] as $doc) {
+                        $folder = $doc['folder'];
+                        if (!isset($documentsByFolder[$folder])) {
+                            $documentsByFolder[$folder] = [];
+                        }
+                        $documentsByFolder[$folder][] = $doc;
+                    }
+                    ?>
+                    
+                    <?php foreach ($documentsByFolder as $folder => $docs): ?>
+                        <div style="margin-bottom: 30px;">
+                            <h3 style="border-bottom: 2px solid #007bff; padding-bottom: 10px;">
+                                📁 <?php 
+                                if ($folder === 'agents') {
+                                    echo 'Agent Documents';
+                                } elseif (strpos($folder, 'customers/') === 0) {
+                                    $customerName = substr($folder, 10);
+                                    echo 'Customer: ' . htmlspecialchars($customerName);
+                                } else {
+                                    echo htmlspecialchars($folder);
+                                }
+                                ?>
+                                <small style="color: #666; font-weight: normal;">(<?php echo count($docs); ?> files)</small>
+                            </h3>
+                            
+                            <div class="document-list">
+                                <?php foreach ($docs as $doc): ?>
+                                    <div class="document-item">
+                                        <div class="document-info">
+                                            <strong><?php echo htmlspecialchars($doc['filename']); ?></strong><br>
+                                            <small>
+                                                📊 Size: <?php echo number_format($doc['size'] / 1024, 1); ?> KB | 
+                                                📅 Modified: <?php echo $doc['modified']; ?><br>
+                                                📂 Location: <?php echo htmlspecialchars($doc['key']); ?>
+                                            </small>
+                                        </div>
+                                        <div class="document-actions">
+                                            <a href="<?php echo htmlspecialchars($doc['download_url']); ?>" 
+                                               class="btn btn-success" target="_blank">📥 Download</a>
+                                            
+                                            <?php if ($doc['can_delete']): ?>
+                                                <form method="post" style="display: inline;" 
+                                                      onsubmit="return confirm('Are you sure you want to delete this document?')">
+                                                    <?= csrf_input() ?>
+                                                    <input type="hidden" name="action" value="delete">
+                                                    <input type="hidden" name="document_key" value="<?php echo htmlspecialchars($doc['key']); ?>">
+                                                    <button type="submit" class="btn btn-danger">🗑️ Delete</button>
+                                                </form>
+                                            <?php else: ?>
+                                                <span class="btn" style="background: #6c757d; color: white; cursor: not-allowed;">🔒 Protected</span>
+                                            <?php endif; ?>
+                                        </div>
+                                    </div>
+                                <?php endforeach; ?>
                             </div>
-                        <?php endforeach; ?>
-                    </div>
+                        </div>
+                    <?php endforeach; ?>
                 <?php endif; ?>
             <?php elseif (DocumentManager::isConfigured() && $listResult && !$listResult['success']): ?>
                 <div class="alert alert-danger">
