@@ -204,12 +204,12 @@ echo "</div>";
 echo "<div class='section'>";
 echo "<h2>🌐 Network Connectivity</h2>";
 $testUrls = [
-    'https://login.microsoftonline.com',
-    'https://graph.microsoft.com',
-    'https://sts.windows.net'
+    'https://login.microsoftonline.com' => [200, 301, 302],
+    'https://graph.microsoft.com/v1.0/$metadata' => [200],  // Proper Graph API endpoint
+    'https://sts.windows.net' => [200, 301, 302]
 ];
 
-foreach ($testUrls as $url) {
+foreach ($testUrls as $url => $validCodes) {
     $ch = curl_init();
     curl_setopt($ch, CURLOPT_URL, $url);
     curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
@@ -220,12 +220,17 @@ foreach ($testUrls as $url) {
     $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
     curl_close($ch);
     
-    if ($httpCode === 200 || $httpCode === 301 || $httpCode === 302) {
+    if (in_array($httpCode, $validCodes)) {
         echo "<div class='success'>✅ $url (HTTP $httpCode)</div>";
     } else {
         echo "<div class='error'>❌ $url (HTTP $httpCode)</div>";
     }
 }
+
+// Add note about Graph API 405 error
+echo "<div class='info'>";
+echo "<strong>ℹ️ Note:</strong> HTTP 405 on https://graph.microsoft.com root is normal - Graph API requires specific endpoints.";
+echo "</div>";
 echo "</div>";
 
 // Test 9: Memory and performance
