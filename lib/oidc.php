@@ -80,14 +80,11 @@ function get_oidc_client($userType = null) {
 
     $oidc->setRedirectURL($config['app']['redirect_uri']);
     
-    // Add scopes one by one (jumbojett expects individual calls)
-    $oidc->addScope("openid");
-    $oidc->addScope("profile");
-    $oidc->addScope("email");
-    
-    // Add additional scopes for B2B (Woodgrove pattern)
+    // Add scopes as array (jumbojett expects array format)
     if ($userType === 'agent') {
-        $oidc->addScope("https://graph.microsoft.com/User.Read");
+        $oidc->addScope(['openid', 'profile', 'email', 'https://graph.microsoft.com/User.Read']);
+    } else {
+        $oidc->addScope(['openid', 'profile', 'email']);
     }
     
     return $oidc;
