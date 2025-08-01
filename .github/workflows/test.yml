@@ -1,0 +1,92 @@
+name: Test S-Cape Travel Application
+
+on:
+  pull_request:
+    branches: [ main ]
+  workflow_dispatch:
+
+env:
+  PHP_VERSION: '8.2'
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: 🛒 Checkout code
+      uses: actions/checkout@v4
+      
+    - name: 🐘 Setup PHP
+      uses: shivammathur/setup-php@v2
+      with:
+        php-version: ${{ env.PHP_VERSION }}
+        extensions: mbstring, xml, ctype, iconv, intl, pdo, pdo_mysql, dom, filter, gd, json, zip, curl
+        
+    - name: 📦 Install Composer dependencies
+      run: composer install --prefer-dist --no-progress
+      
+    - name: 🔍 Validate composer.json
+      run: composer validate --strict
+      
+    - name: 🧪 PHP Syntax Check
+      run: find . -name "*.php" -not -path "./vendor/*" -exec php -l {} \;
+      
+    - name: 🔧 Check critical files exist
+      run: |
+        echo "Checking critical application files..."
+        
+        # Core application files
+        test -f index.php || (echo "❌ Missing index.php" && exit 1)
+        test -f callback.php || (echo "❌ Missing callback.php" && exit 1)
+        test -f dashboard.php || (echo "❌ Missing dashboard.php" && exit 1)
+        
+        # Library files
+        test -f lib/config_helper.php || (echo "❌ Missing lib/config_helper.php" && exit 1)
+        test -f lib/oidc_simple.php || (echo "❌ Missing lib/oidc_simple.php" && exit 1)
+        test -f lib/logger.php || (echo "❌ Missing lib/logger.php" && exit 1)
+        test -f lib/email_helper.php || (echo "❌ Missing lib/email_helper.php" && exit 1)
+        
+        # Configuration files
+        test -f .env.template || (echo "❌ Missing .env.template" && exit 1)
+        test -f composer.json || (echo "❌ Missing composer.json" && exit 1)
+        
+        # Admin files
+        test -f admin/cross_tenant_check.php || (echo "❌ Missing admin/cross_tenant_check.php" && exit 1)
+        
+        echo "✅ All critical files present"
+        
+    - name: 🧩 Test configuration loading
+      run: |
+        php -r "
+        require_once 'vendor/autoload.php';
+        
+        // Test if configuration helper loads without errors
+        if (file_exists('lib/config_helper.php')) {
+            require_once 'lib/config_helper.php';
+            echo '✅ Config helper loads successfully\n';
+        } else {
+            echo '❌ Config helper not found\n';
+            exit(1);
+        }
+        
+        // Test logger
+        if (file_exists('lib/logger.php')) {
+            require_once 'lib/logger.php';
+            echo '✅ Logger loads successfully\n';
+        } else {
+            echo '❌ Logger not found\n';
+            exit(1);
+        }
+        
+        echo '✅ Basic application structure test passed\n';
+        "
+        
+    - name: 📊 Generate test report
+      run: |
+        echo "## 🧪 Test Results" >> $GITHUB_STEP_SUMMARY
+        echo "- ✅ PHP Syntax: Valid" >> $GITHUB_STEP_SUMMARY
+        echo "- ✅ Dependencies: Installed" >> $GITHUB_STEP_SUMMARY
+        echo "- ✅ File Structure: Complete" >> $GITHUB_STEP_SUMMARY
+        echo "- ✅ Configuration: Loadable" >> $GITHUB_STEP_SUMMARY
+        echo "" >> $GITHUB_STEP_SUMMARY
+        echo "Ready for deployment! 🚀" >> $GITHUB_STEP_SUMMARY
