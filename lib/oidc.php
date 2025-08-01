@@ -79,11 +79,15 @@ function get_oidc_client($userType = null) {
     );
 
     $oidc->setRedirectURL($config['app']['redirect_uri']);
-    $oidc->addScope(["openid", "profile", "email"]);
+    
+    // Add scopes one by one (jumbojett expects individual calls)
+    $oidc->addScope("openid");
+    $oidc->addScope("profile");
+    $oidc->addScope("email");
     
     // Add additional scopes for B2B (Woodgrove pattern)
     if ($userType === 'agent') {
-        $oidc->addScope(["https://graph.microsoft.com/User.Read"]);
+        $oidc->addScope("https://graph.microsoft.com/User.Read");
     }
     
     return $oidc;
@@ -142,11 +146,26 @@ function start_authentication($userType) {
         $_SESSION['auth_user_type'] = $userType;
         
         $oidc = get_oidc_client($userType);
+        
+        // Log the OIDC configuration for debugging
+        $logger->debug('OIDC client configured', [
+            'user_type' => $userType,
+            'redirect_url' => $oidc->getRedirectURL(),
+            'provider_url' => $oidc->getProviderURL()
+        ]);
+        
+        // This should redirect to Microsoft
+        $logger->info('Calling OIDC authenticate - should redirect');
         $oidc->authenticate();
+        
+        // If we reach here, something went wrong
+        $logger->error('OIDC authenticate returned without redirect');
         
     } catch (Exception $e) {
         $logger->error('Authentication failed', [
-            'error' => $e->getMessage()
+            'error' => $e->getMessage(),
+            'line' => $e->getLine(),
+            'file' => $e->getFile()
         ]);
         header('Location: /index.php?error=auth_failed');
         exit;
