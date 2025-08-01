@@ -1,5 +1,6 @@
 <?php
 // File: apply_agent.php
+require_once __DIR__ . '/lib/oidc.php';
 require_once __DIR__ . '/lib/logger.php';
 
 $logger = ScapeLogger::getInstance();
