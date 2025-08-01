@@ -14,16 +14,16 @@ use Monolog\Processor\MemoryUsageProcessor;
 
 class ScapeLogger {
     private static $instance = null;
-    private Logger $logger;
-    private Logger $errorLogger;
-    private Logger $debugLogger;
+    private $logger;
+    private $errorLogger;
+    private $debugLogger;
     
     private function __construct() {
         $this->setupLoggers();
         $this->setupErrorHandling();
     }
     
-    public static function getInstance(): ScapeLogger {
+    public static function getInstance() {
         if (self::$instance === null) {
             self::$instance = new self();
         }
@@ -185,7 +185,7 @@ class ScapeLogger {
         $this->logger->critical($message, $context);
     }
     
-    private function getRequestId(): string {
+    private function getRequestId() {
         static $requestId = null;
         if ($requestId === null) {
             $requestId = 'req_' . uniqid();
@@ -193,7 +193,7 @@ class ScapeLogger {
         return $requestId;
     }
     
-    private function getCurrentUserId(): string {
+    private function getCurrentUserId() {
         return $_SESSION['email'] ?? 'anonymous';
     }
 }
