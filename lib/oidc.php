@@ -68,8 +68,8 @@ function get_oidc_client($userType = null) {
     } else {
         // External tenant for customers (Microsoft External ID)
         $clientConfig = $config['b2c'];
-        // External ID uses standard Microsoft identity platform v2.0 endpoint
-        $authority = "https://login.microsoftonline.com/{$clientConfig['tenant_id']}/v2.0";
+        // External ID uses the CIAM (Customer Identity Access Management) endpoint
+        $authority = "https://{$clientConfig['tenant_name']}.ciamlogin.com/{$clientConfig['tenant_name']}.onmicrosoft.com/v2.0";
     }
 
     $oidc = new OpenIDConnectClient(
