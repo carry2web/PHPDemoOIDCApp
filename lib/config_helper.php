@@ -179,7 +179,7 @@ function setup_logging() {
  */
 function log_security_event($event, $details = []) {
     $logger = ScapeLogger::getInstance();
-    $logger->security($event, array_merge($details, [
+    $logger->warning($event, array_merge($details, [
         'ip' => $_SERVER['REMOTE_ADDR'] ?? 'unknown',
         'user_agent' => $_SERVER['HTTP_USER_AGENT'] ?? 'unknown',
         'session_id' => session_id()

@@ -1,0 +1,26 @@
+[2025-08-01 22:12:58] DEBUG scape_app: Loading application configuration []
+[2025-08-01 22:12:58] DEBUG scape_app: Configuration loaded successfully {"has_b2c_config":true,"has_b2b_config":true,"has_graph_config":true,"has_aws_config":true,"debug_mode":true}
+[2025-08-01 22:12:58] INFO scape_app: Debug mode enabled, configuring PHP error reporting []
+[2025-08-01 22:12:58] DEBUG scape_app: PHP error logging configured {"log_file":"/tmp/scape_travel.log"}
+[2025-08-01 22:12:58] INFO scape_app: Application started {"page":"index.php"}
+[2025-08-01 22:14:19] DEBUG scape_app: Loading application configuration []
+[2025-08-01 22:14:19] DEBUG scape_app: Configuration loaded successfully {"has_b2c_config":true,"has_b2b_config":true,"has_graph_config":true,"has_aws_config":true,"debug_mode":true}
+[2025-08-01 22:14:19] INFO scape_app: Debug mode enabled, configuring PHP error reporting []
+[2025-08-01 22:14:19] DEBUG scape_app: PHP error logging configured {"log_file":"/tmp/scape_travel.log"}
+[2025-08-01 22:14:19] INFO scape_app: Application started {"page":"index.php"}
+[2025-08-01 22:14:59] DEBUG scape_app: Loading application configuration []
+[2025-08-01 22:14:59] DEBUG scape_app: Configuration loaded successfully {"has_b2c_config":true,"has_b2b_config":true,"has_graph_config":true,"has_aws_config":true,"debug_mode":true}
+[2025-08-01 22:14:59] INFO scape_app: Debug mode enabled, configuring PHP error reporting []
+[2025-08-01 22:14:59] DEBUG scape_app: PHP error logging configured {"log_file":"/tmp/scape_travel.log"}
+[2025-08-01 22:15:59] DEBUG scape_app: Loading application configuration []
+[2025-08-01 22:15:59] DEBUG scape_app: Configuration loaded successfully {"has_b2c_config":true,"has_b2b_config":true,"has_graph_config":true,"has_aws_config":true,"debug_mode":true}
+[2025-08-01 22:15:59] INFO scape_app: Debug mode enabled, configuring PHP error reporting []
+[2025-08-01 22:15:59] DEBUG scape_app: PHP error logging configured {"log_file":"/tmp/scape_travel.log"}
+[2025-08-01 22:15:59] WARNING scape_app: session_started {"session_id":"","ip":"unknown","user_agent":"unknown"}
+[2025-08-01 22:16:07] DEBUG scape_app: Loading application configuration []
+[2025-08-01 22:16:07] DEBUG scape_app: Configuration loaded successfully {"has_b2c_config":true,"has_b2b_config":true,"has_graph_config":true,"has_aws_config":true,"debug_mode":true}
+[2025-08-01 22:16:07] INFO scape_app: Debug mode enabled, configuring PHP error reporting []
+[2025-08-01 22:16:07] DEBUG scape_app: PHP error logging configured {"log_file":"/tmp/scape_travel.log"}
+[2025-08-01 22:16:07] INFO scape_app: Application started {"page":"index.php"}
+[2025-08-01 22:16:07] WARNING scape_app: session_started {"session_id":"7g81luihnto497h6fkc9faj2le","ip":"::1","user_agent":"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Code/1.102.2 Chrome/134.0.6998.205 Electron/35.6.0 Safari/537.36"}
+[2025-08-01 22:16:07] DEBUG scape_app: User accessing index page {"ip":"::1","user_agent":"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Code/1.102.2 Chrome/134.0.6998.205 Electron/35.6.0 Safari/537.36","session_id":"7g81luihnto497h6fkc9faj2le"}
