@@ -131,54 +131,52 @@ function is_scape_employee($claims, $userType) {
 }
 
 /**
- * Start authentication flow
+ * Start authentication flow - SIMPLE VERSION
  */
 function start_authentication($userType) {
     $logger = ScapeLogger::getInstance();
     
     try {
-        $logger->info('Starting authentication flow', ['user_type' => $userType]);
-        $config = get_app_config();
+        $logger->info('Starting authentication', ['user_type' => $userType]);
         
         $_SESSION['auth_user_type'] = $userType;
         
         $oidc = get_oidc_client($userType);
-        
-        $logger->info('Starting OIDC authentication');
         $oidc->authenticate();
         
     } catch (Exception $e) {
-        $logger->error('Authentication start failed', [
-            'user_type' => $userType,
-            'error' => $e->getMessage(),
-            'trace' => $e->getTraceAsString()
+        $logger->error('Authentication failed', [
+            'error' => $e->getMessage()
         ]);
-        
-        header('Location: /index.php?error=' . urlencode($e->getMessage()));
+        header('Location: /index.php?error=auth_failed');
         exit;
     }
 }
 
 /**
- * Handle authentication callback
+ * Handle authentication callback - SIMPLE WORKING VERSION
  */
 function handle_authentication_callback() {
     $logger = ScapeLogger::getInstance();
     
     try {
+        // Check if we have the authorization code
+        if (!isset($_GET['code'])) {
+            $logger->error('No authorization code in callback');
+            return false;
+        }
+
         $userType = $_SESSION['auth_user_type'] ?? 'customer';
-        $logger->info('Handling authentication callback', ['user_type' => $userType]);
+        $logger->info('Processing callback', [
+            'user_type' => $userType,
+            'has_code' => isset($_GET['code']),
+            'has_state' => isset($_GET['state'])
+        ]);
         
         $oidc = get_oidc_client($userType);
         
-        $logger->debug('About to call OIDC authenticate', [
-            'user_type' => $userType
-        ]);
-
-        $authResult = $oidc->authenticate();
-        $logger->debug('OIDC authenticate returned', ['result' => $authResult]);
-
-        if ($authResult) {
+        // Simple direct authentication
+        if ($oidc->authenticate()) {
             $claims = $oidc->getVerifiedClaims();
             
             $logger->info('Authentication successful', [
@@ -194,32 +192,25 @@ function handle_authentication_callback() {
             $_SESSION['claims'] = json_encode($claims);
             $_SESSION['authenticated_at'] = time();
             
-            // Determine user role
-            $role = get_user_role($claims, $userType);
+            // Simple role determination
+            $role = ($userType === 'agent') ? 'agent' : 'customer';
             $_SESSION['role'] = $role;
             
-            $logger->info('User session established', [
+            $logger->info('User session created', [
                 'email' => $_SESSION['email'],
-                'role' => $role,
-                'user_type' => $userType
+                'role' => $role
             ]);
             
             return true;
-        } else {
-            $logger->error('OIDC authenticate returned false', [
-                'user_type' => $userType,
-                'GET_params' => $_GET,
-                'POST_params' => $_POST,
-                'session_auth_user_type' => $_SESSION['auth_user_type'] ?? 'not_set'
-            ]);
         }
         
+        $logger->error('OIDC authentication failed');
         return false;
         
     } catch (Exception $e) {
-        $logger->error('Authentication callback failed', [
+        $logger->error('Callback failed', [
             'error' => $e->getMessage(),
-            'trace' => $e->getTraceAsString()
+            'line' => $e->getLine()
         ]);
         return false;
     }
