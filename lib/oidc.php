@@ -65,9 +65,11 @@ function get_oidc_client($userType = null) {
         $clientConfig = $config['b2b'];
         $authority = "https://login.microsoftonline.com/{$clientConfig['tenant_id']}/v2.0";
     } else {
-        // External tenant for customers (B2C)
+        // External tenant for customers (Microsoft External ID)
         $clientConfig = $config['b2c'];
-        $authority = "https://login.microsoftonline.com/{$clientConfig['tenant_id']}/v2.0";
+        // Following Woodgrove External ID pattern - use tenant.onmicrosoft.com format
+        $tenantName = $clientConfig['tenant_name'];
+        $authority = "https://login.microsoftonline.com/$tenantName.onmicrosoft.com/v2.0";
     }
 
     $oidc = new OpenIDConnectClient(
@@ -77,11 +79,11 @@ function get_oidc_client($userType = null) {
     );
 
     $oidc->setRedirectURL($config['app']['redirect_uri']);
-    $oidc->addScope("openid profile email");
+    $oidc->addScope(["openid", "profile", "email"]);
     
     // Add additional scopes for B2B (Woodgrove pattern)
     if ($userType === 'agent') {
-        $oidc->addScope("https://graph.microsoft.com/User.Read");
+        $oidc->addScope(["https://graph.microsoft.com/User.Read"]);
     }
     
     return $oidc;

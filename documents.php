@@ -4,8 +4,10 @@ require_once 'vendor/autoload.php';
 require_once 'lib/config_helper.php';
 require_once 'lib/document_manager.php';
 require_once 'lib/logger.php';
+require_once 'lib/security_helper.php';
 
 $logger = ScapeLogger::getInstance();
+$security = SecurityHelper::getInstance();
 
 // Check if user is logged in
 if (!isset($_SESSION['scape_user'])) {
@@ -16,43 +18,129 @@ if (!isset($_SESSION['scape_user'])) {
 $user = $_SESSION['scape_user'];
 $userType = isset($user['user_type']) ? $user['user_type'] : 'customer';
 
-// Handle file upload
+// Handle file upload and delete operations
 $uploadResult = null;
 $listResult = null;
 $deleteResult = null;
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    if (isset($_POST['action'])) {
-        if ($_POST['action'] === 'upload' && isset($_FILES['document']) && $_FILES['document']['error'] === UPLOAD_ERR_OK) {
-            if (DocumentManager::isConfigured()) {
-                $docManager = new DocumentManager();
-                $fileName = $_FILES['document']['name'];
-                $fileContent = file_get_contents($_FILES['document']['tmp_name']);
-                $contentType = get_mime_type($fileName);
-                
-                $uploadResult = $docManager->uploadDocument($userType, $fileName, $fileContent, $contentType);
-                $logger->info("Document upload attempt", [
-                    'user_email' => $user['email'],
-                    'user_type' => $userType,
-                    'filename' => $fileName,
-                    'success' => $uploadResult['success']
-                ]);
-            } else {
-                $uploadResult = [
+    // Rate limiting check
+    $rateLimitKey = 'documents_' . ($user['email'] ?? session_id());
+    if (!$security->checkRateLimit($rateLimitKey, 10, 300)) {
+        $uploadResult = $deleteResult = [
+            'success' => false,
+            'error' => 'Too many requests. Please try again later.'
+        ];
+    } else {
+        // CSRF protection
+        $csrfToken = $_POST['csrf_token'] ?? '';
+        if (!$security->validateCSRFToken($csrfToken)) {
+            $uploadResult = $deleteResult = [
+                'success' => false,
+                'error' => 'Security token validation failed. Please refresh the page.'
+            ];
+        } else {
+            // Validate action
+            $actionValidation = $security->validateAction($_POST['action'] ?? '', ['upload', 'delete']);
+            if (!$actionValidation['valid']) {
+                $uploadResult = $deleteResult = [
                     'success' => false,
-                    'error' => 'AWS credentials not configured'
+                    'error' => $actionValidation['error']
                 ];
-            }
-        } elseif ($_POST['action'] === 'delete' && isset($_POST['document_key'])) {
-            if (DocumentManager::isConfigured()) {
-                $docManager = new DocumentManager();
-                $deleteResult = $docManager->deleteDocument($_POST['document_key'], $userType);
-                $logger->info("Document delete attempt", [
-                    'user_email' => $user['email'],
-                    'user_type' => $userType,
-                    'key' => $_POST['document_key'],
-                    'success' => $deleteResult['success']
-                ]);
+            } else {
+                $action = $actionValidation['value'];
+                
+                if ($action === 'upload' && isset($_FILES['document'])) {
+                    // Enhanced file upload validation
+                    $fileValidation = $security->validateFileUpload($_FILES['document'], [
+                        'maxSize' => 15 * 1024 * 1024, // 15MB for documents
+                        'allowedMimeTypes' => [
+                            'application/pdf',
+                            'image/jpeg',
+                            'image/png',
+                            'image/gif',
+                            'text/plain',
+                            'application/msword',
+                            'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+                            'application/vnd.ms-excel',
+                            'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+                        ],
+                        'allowedExtensions' => ['pdf', 'jpg', 'jpeg', 'png', 'gif', 'txt', 'doc', 'docx', 'xls', 'xlsx']
+                    ]);
+                    
+                    if (!$fileValidation['valid']) {
+                        $uploadResult = [
+                            'success' => false,
+                            'error' => $fileValidation['error']
+                        ];
+                        $logger->warning('File upload validation failed', [
+                            'user_email' => $user['email'],
+                            'error' => $fileValidation['error'],
+                            'filename' => $_FILES['document']['name'] ?? 'unknown'
+                        ]);
+                    } else {
+                        if (DocumentManager::isConfigured()) {
+                            $docManager = new DocumentManager();
+                            $fileContent = file_get_contents($fileValidation['tmp_name']);
+                            
+                            $uploadResult = $docManager->uploadDocument(
+                                $userType, 
+                                $fileValidation['filename'], 
+                                $fileContent, 
+                                $fileValidation['mime_type']
+                            );
+                            
+                            $logger->info("Document upload attempt", [
+                                'user_email' => $user['email'],
+                                'user_type' => $userType,
+                                'filename' => $fileValidation['filename'],
+                                'original_filename' => $fileValidation['original_filename'],
+                                'size' => $fileValidation['size'],
+                                'success' => $uploadResult['success']
+                            ]);
+                        } else {
+                            $uploadResult = [
+                                'success' => false,
+                                'error' => 'Document storage not configured'
+                            ];
+                        }
+                    }
+                } elseif ($action === 'delete' && isset($_POST['document_key'])) {
+                    // Validate document key
+                    $documentKey = trim($_POST['document_key']);
+                    if (empty($documentKey) || strlen($documentKey) > 500) {
+                        $deleteResult = [
+                            'success' => false,
+                            'error' => 'Invalid document identifier'
+                        ];
+                    } elseif (strpos($documentKey, '..') !== false || strpos($documentKey, '/') === 0) {
+                        $deleteResult = [
+                            'success' => false,
+                            'error' => 'Invalid document path'
+                        ];
+                        $logger->security('Attempted path traversal in document delete', [
+                            'user_email' => $user['email'],
+                            'document_key' => $documentKey,
+                            'ip' => $_SERVER['REMOTE_ADDR'] ?? 'unknown'
+                        ]);
+                    } else {
+                        if (DocumentManager::isConfigured()) {
+                            $docManager = new DocumentManager();
+                            $deleteResult = $docManager->deleteDocument($documentKey, $userType);
+                            $logger->info("Document delete attempt", [
+                                'user_email' => $user['email'],
+                                'user_type' => $userType,
+                                'key' => $documentKey,
+                                'success' => $deleteResult['success']
+                            ]);
+                        } else {
+                            $deleteResult = [
+                                'success' => false,
+                                'error' => 'Document storage not configured'
+                            ];
+                        }
+                    }
+                }
             }
         }
     }
@@ -179,14 +267,16 @@ if (DocumentManager::isConfigured()) {
             <h2>📤 Upload Document</h2>
             <?php if (DocumentManager::isConfigured()): ?>
                 <form method="post" enctype="multipart/form-data">
+                    <?= csrf_input() ?>
                     <input type="hidden" name="action" value="upload">
                     <div class="upload-area">
-                        <input type="file" name="document" required accept=".pdf,.doc,.docx,.txt,.jpg,.jpeg,.png,.gif,.zip,.csv,.xlsx">
+                        <input type="file" name="document" required accept=".pdf,.doc,.docx,.txt,.jpg,.jpeg,.png,.gif,.xls,.xlsx">
                         <br><br>
                         <button type="submit" class="btn btn-primary">📤 Upload Document</button>
                     </div>
                 </form>
-                <p><strong>Supported formats:</strong> PDF, DOC, DOCX, TXT, JPG, PNG, GIF, ZIP, CSV, XLSX</p>
+                <p><strong>Supported formats:</strong> PDF, DOC, DOCX, TXT, JPG, PNG, GIF, XLS, XLSX (Max 15MB)</p>
+                <p><strong>Security:</strong> All files are scanned for malicious content before upload.</p>
             <?php else: ?>
                 <div class="upload-area">
                     <p>📋 Upload functionality requires AWS configuration</p>
@@ -216,6 +306,7 @@ if (DocumentManager::isConfigured()) {
                                        class="btn btn-success" target="_blank">📥 Download</a>
                                     <form method="post" style="display: inline;" 
                                           onsubmit="return confirm('Are you sure you want to delete this document?')">
+                                        <?= csrf_input() ?>
                                         <input type="hidden" name="action" value="delete">
                                         <input type="hidden" name="document_key" value="<?php echo htmlspecialchars($doc['key']); ?>">
                                         <button type="submit" class="btn btn-danger">🗑️ Delete</button>

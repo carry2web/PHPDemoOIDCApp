@@ -7,11 +7,13 @@ require_once __DIR__ . '/../lib/graph_helper.php';
 require_once __DIR__ . '/../lib/config_helper.php';
 require_once __DIR__ . '/../lib/logger.php';
 require_once __DIR__ . '/../lib/email_helper.php';
+require_once __DIR__ . '/../lib/security_helper.php';
 
 start_azure_safe_session();
 
 $config = get_app_config();
 $logger = ScapeLogger::getInstance();
+$security = SecurityHelper::getInstance();
 
 // Validate configuration first (Woodgrove pattern)
 $configErrors = validate_configuration();
@@ -66,70 +68,115 @@ if (isset($_POST['logout']) || isset($_GET['logout'])) {
 // Handle approval/rejection actions
 $message = '';
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
-    $action = $_POST['action'];
-    $email = $_POST['email'] ?? '';
-    $name = $_POST['name'] ?? '';
+    // Rate limiting for admin actions
+    $adminEmail = $_SESSION['admin_user']['email'] ?? 'unknown';
+    $rateLimitKey = 'admin_actions_' . $adminEmail;
     
-    $logger->info('Admin action initiated', [
-        'action' => $action,
-        'target_email' => $email,
-        'admin_user' => $_SESSION['admin_user']['email'] ?? 'unknown'
-    ]);
-    
-    if ($action === 'approve' && !empty($email) && !empty($name)) {
-        $startTime = microtime(true);
-        
-        // Send B2B invitation via Graph API
-        $result = invite_agent_to_internal_tenant($email, $name);
-        
-        $duration = round((microtime(true) - $startTime) * 1000, 2);
-        
-        if ($result['success']) {
-            $message = "✅ Agent approved and B2B invitation sent to {$email}";
-            
-            $logger->info('Agent approval successful', [
-                'email' => $email,
-                'invitation_id' => $result['invitationId'] ?? 'unknown',
-                'duration_ms' => $duration
+    if (!$security->checkRateLimit($rateLimitKey, 20, 300)) {
+        $message = "⚠️ Too many admin actions. Please wait before trying again.";
+        $logger->warning('Admin rate limit exceeded', ['admin' => $adminEmail]);
+    } else {
+        // CSRF protection
+        $csrfToken = $_POST['csrf_token'] ?? '';
+        if (!$security->validateCSRFToken($csrfToken)) {
+            $message = "❌ Security token validation failed. Please refresh the page.";
+            $logger->security('CSRF validation failed for admin action', [
+                'admin' => $adminEmail,
+                'action' => $_POST['action'] ?? 'unknown'
             ]);
-            
-            // Send approval notification email
-            $emailResult = notify_agent_approval($email, $name, $result['inviteRedeemUrl'] ?? null);
-            if (!$emailResult['success']) {
-                $logger->warning('Agent approval email failed', [
-                    'email' => $email,
-                    'error' => $emailResult['error'] ?? 'unknown'
-                ]);
-            }
-            
-            // Mark as approved in applications file
-            mark_application_approved($email);
         } else {
-            $message = "❌ Failed to send invitation: " . $result['error'];
-            $logger->error('Agent approval failed', [
-                'email' => $email,
-                'error' => $result['error'],
-                'duration_ms' => $duration
-            ]);
-        }
-    } elseif ($action === 'reject' && !empty($email)) {
-        $reason = $_POST['rejection_reason'] ?? 'Application does not meet current requirements';
-        
-        mark_application_rejected($email, $reason);
-        $message = "❌ Application for {$email} has been rejected";
-        
-        $logger->info('Agent application rejected', [
-            'email' => $email,
-            'reason' => $reason
-        ]);
-        
-        // Send rejection notification email
-        $emailResult = notify_agent_rejection($email, $name, $reason);
-        if (!$emailResult['success']) {
-            $logger->warning('Agent rejection email failed', [
-                'email' => $email,
-                'error' => $emailResult['error'] ?? 'unknown'
-            ]);
+            // Validate action
+            $actionValidation = $security->validateAction($_POST['action'] ?? '', ['approve', 'reject']);
+            if (!$actionValidation['valid']) {
+                $message = "❌ " . $actionValidation['error'];
+            } else {
+                $action = $actionValidation['value'];
+                
+                // Validate email
+                $emailValidation = $security->validateEmail($_POST['email'] ?? '');
+                if (!$emailValidation['valid']) {
+                    $message = "❌ " . $emailValidation['error'];
+                } else {
+                    $email = $emailValidation['value'];
+                    
+                    // Validate name
+                    $nameValidation = $security->validateName($_POST['name'] ?? '');
+                    if (!$nameValidation['valid']) {
+                        $message = "❌ " . $nameValidation['error'];
+                    } else {
+                        $name = $nameValidation['value'];
+                        
+                        $logger->info('Admin action initiated', [
+                            'action' => $action,
+                            'target_email' => $email,
+                            'admin_user' => $adminEmail
+                        ]);
+                        
+                        if ($action === 'approve') {
+                            $startTime = microtime(true);
+                            
+                            // Send B2B invitation via Graph API
+                            $result = invite_agent_to_internal_tenant($email, $name);
+                            $duration = round((microtime(true) - $startTime) * 1000, 2);
+                            
+                            if ($result['success']) {
+                                $message = "✅ Agent approved and B2B invitation sent to {$email}";
+                                
+                                $logger->info('Agent approval successful', [
+                                    'email' => $email,
+                                    'invitation_id' => $result['invitationId'] ?? 'unknown',
+                                    'duration_ms' => $duration
+                                ]);
+                                
+                                // Send approval notification email
+                                $emailResult = notify_agent_approval($email, $name, $result['inviteRedeemUrl'] ?? null);
+                                if (!$emailResult['success']) {
+                                    $logger->warning('Agent approval email failed', [
+                                        'email' => $email,
+                                        'error' => $emailResult['error'] ?? 'unknown'
+                                    ]);
+                                }
+                                
+                                // Mark as approved in applications file
+                                mark_application_approved($email);
+                            } else {
+                                $message = "❌ Failed to send invitation: " . $result['error'];
+                                $logger->error('Agent approval failed', [
+                                    'email' => $email,
+                                    'error' => $result['error'],
+                                    'duration_ms' => $duration
+                                ]);
+                            }
+                        } elseif ($action === 'reject') {
+                            // Validate rejection reason
+                            $reasonValidation = $security->validateReason($_POST['rejection_reason'] ?? '');
+                            if (!$reasonValidation['valid']) {
+                                $message = "❌ " . $reasonValidation['error'];
+                            } else {
+                                $reason = $reasonValidation['value'];
+                                
+                                mark_application_rejected($email, $reason);
+                                $message = "❌ Application for {$email} has been rejected";
+                                
+                                $logger->info('Agent application rejected', [
+                                    'email' => $email,
+                                    'reason' => $reason,
+                                    'admin_user' => $adminEmail
+                                ]);
+                                
+                                // Send rejection notification email
+                                $emailResult = notify_agent_rejection($email, $name, $reason);
+                                if (!$emailResult['success']) {
+                                    $logger->warning('Agent rejection email failed', [
+                                        'email' => $email,
+                                        'error' => $emailResult['error'] ?? 'unknown'
+                                    ]);
+                                }
+                            }
+                        }
+                    }
+                }
+            }
         }
     }
 }
@@ -389,6 +436,7 @@ function mark_application_rejected($email, $reason = null) {
             <?php if ($status === 'pending'): ?>
             <div class="action-buttons">
                 <form method="post" style="display: inline;">
+                    <?= csrf_input() ?>
                     <input type="hidden" name="action" value="approve">
                     <input type="hidden" name="email" value="<?= htmlspecialchars($app['email']) ?>">
                     <input type="hidden" name="name" value="<?= htmlspecialchars($app['name']) ?>">
@@ -440,6 +488,7 @@ function mark_application_rejected($email, $reason = null) {
         <a href="../admin/config_check.php" class="button">🔧 Configuration Check</a>
         <a href="../index.php" class="button customer">🏠 Back to Site</a>
         <form method="post" style="display: inline;">
+            <?= csrf_input() ?>
             <input type="hidden" name="logout" value="1">
             <button type="submit" class="button" style="background: #dc3545;">🚪 Logout</button>
         </form>
@@ -450,6 +499,7 @@ function mark_application_rejected($email, $reason = null) {
         <div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); background: white; padding: 2em; border-radius: 8px; max-width: 500px; width: 90%;">
             <h3>Reject Agent Application</h3>
             <form method="post" id="rejectForm">
+                <?= csrf_input() ?>
                 <input type="hidden" name="action" value="reject">
                 <input type="hidden" name="email" id="rejectEmail">
                 <input type="hidden" name="name" id="rejectName">

@@ -36,8 +36,9 @@ function get_app_config() {
                 'tenant_id' => $env['EXTERNAL_TENANT_ID'],
                 'client_id' => $env['EXTERNAL_CLIENT_ID'],
                 'client_secret' => $env['EXTERNAL_CLIENT_SECRET'],
-                'domain' => 'scapecustomers.onmicrosoft.com', // Your B2C tenant name
-                'policy_signup_signin' => 'B2C_1_signupsignin',
+                'tenant_name' => $env['B2C_TENANT_NAME'] ?? 'scapecustomers',
+                'domain' => ($env['B2C_TENANT_NAME'] ?? 'scapecustomers') . '.onmicrosoft.com',
+                'policy_signup_signin' => $env['B2C_POLICY_SIGNUP_SIGNIN'] ?? 'B2C_1_signupsignin',
                 'policy_password_reset' => 'B2C_1_passwordreset',
                 'policy_profile_edit' => 'B2C_1_profileedit'
             ],
@@ -45,7 +46,7 @@ function get_app_config() {
                 'tenant_id' => $env['INTERNAL_TENANT_ID'],
                 'client_id' => $env['INTERNAL_CLIENT_ID'],
                 'client_secret' => $env['INTERNAL_CLIENT_SECRET'],
-                'domain' => 'scapetravel.onmicrosoft.com'
+                'domain' => $env['INTERNAL_TENANT_DOMAIN'] ?? 'scapetravel.onmicrosoft.com'
             ],
             'graph' => [
                 'client_id' => $env['GRAPH_CLIENT_ID'],
@@ -98,10 +99,11 @@ function get_b2c_policy_urls() {
     $config = get_app_config();
     $tenantName = explode('.', $config['b2c']['domain'])[0];
     
+    // Following Woodgrove External ID pattern - use standard onmicrosoft.com endpoint
     return [
-        'signup_signin' => "https://$tenantName.b2clogin.com/$tenantName.onmicrosoft.com/{$config['b2c']['policy_signup_signin']}",
-        'password_reset' => "https://$tenantName.b2clogin.com/$tenantName.onmicrosoft.com/{$config['b2c']['policy_password_reset']}",
-        'profile_edit' => "https://$tenantName.b2clogin.com/$tenantName.onmicrosoft.com/{$config['b2c']['policy_profile_edit']}"
+        'signup_signin' => "https://login.microsoftonline.com/$tenantName.onmicrosoft.com/oauth2/v2.0/authorize",
+        'password_reset' => "https://login.microsoftonline.com/$tenantName.onmicrosoft.com/oauth2/v2.0/authorize",
+        'profile_edit' => "https://login.microsoftonline.com/$tenantName.onmicrosoft.com/oauth2/v2.0/authorize"
     ];
 }
 

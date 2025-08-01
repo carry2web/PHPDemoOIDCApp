@@ -50,16 +50,17 @@ function start_authentication($userType) {
         $_SESSION['auth_user_type'] = $userType;
         
         if ($userType === 'customer') {
-            // B2C Configuration for customers
-            $tenantName = 'scapecustomers';
-            $policy = 'B2C_1_signupsignin';
-            $authority = "https://$tenantName.b2clogin.com/$tenantName.onmicrosoft.com/$policy/v2.0";
+            // B2C Configuration for customers (Microsoft External ID)
+            $tenantName = $config['b2c']['tenant_name'];
+            // Following Woodgrove External ID pattern - use standard onmicrosoft.com endpoint
+            $authority = "https://login.microsoftonline.com/$tenantName.onmicrosoft.com/v2.0";
             $clientId = $config['b2c']['client_id'];
             $clientSecret = $config['b2c']['client_secret'];
             
-            $logger->debug('B2C configuration', [
+            $logger->debug('External ID configuration', [
                 'authority' => $authority,
-                'client_id' => $clientId
+                'client_id' => $clientId,
+                'tenant_name' => $tenantName
             ]);
         } else {
             // B2B Configuration for agents/employees
@@ -81,10 +82,10 @@ function start_authentication($userType) {
         );
 
         $oidc->setRedirectURL($config['app']['redirect_uri']);
-        $oidc->addScope("openid profile email");
+        $oidc->addScope(["openid", "profile", "email"]);
         
         if ($userType === 'agent') {
-            $oidc->addScope("https://graph.microsoft.com/User.Read");
+            $oidc->addScope(["https://graph.microsoft.com/User.Read"]);
         }
         
         $logger->info('Starting OIDC authentication');
@@ -115,9 +116,9 @@ function handle_authentication_callback() {
         $config = get_app_config();
         
         if ($userType === 'customer') {
-            $tenantName = 'scapecustomers';
-            $policy = 'B2C_1_signupsignin';
-            $authority = "https://$tenantName.b2clogin.com/$tenantName.onmicrosoft.com/$policy/v2.0";
+            $tenantName = $config['b2c']['tenant_name'];
+            // Following Woodgrove External ID pattern - use standard onmicrosoft.com endpoint  
+            $authority = "https://login.microsoftonline.com/$tenantName.onmicrosoft.com/v2.0";
             $clientId = $config['b2c']['client_id'];
             $clientSecret = $config['b2c']['client_secret'];
         } else {
@@ -133,10 +134,10 @@ function handle_authentication_callback() {
         );
         
         $oidc->setRedirectURL($config['app']['redirect_uri']);
-        $oidc->addScope("openid profile email");
+        $oidc->addScope(["openid", "profile", "email"]);
         
         if ($userType === 'agent') {
-            $oidc->addScope("https://graph.microsoft.com/User.Read");
+            $oidc->addScope(["https://graph.microsoft.com/User.Read"]);
         }
         
         if ($oidc->authenticate()) {
