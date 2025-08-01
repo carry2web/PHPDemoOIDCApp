@@ -52,15 +52,17 @@ function start_authentication($userType) {
         if ($userType === 'customer') {
             // B2C Configuration for customers (Microsoft External ID)
             $tenantName = $config['b2c']['tenant_name'];
-            // Following Woodgrove External ID pattern - use standard onmicrosoft.com endpoint
-            $authority = "https://login.microsoftonline.com/$tenantName.onmicrosoft.com/v2.0";
+            $policy = $config['b2c']['policy_signup_signin'];
+            // External ID uses policy-specific authority format
+            $authority = "https://$tenantName.ciamlogin.com/$tenantName.onmicrosoft.com/$policy/v2.0";
             $clientId = $config['b2c']['client_id'];
             $clientSecret = $config['b2c']['client_secret'];
             
             $logger->debug('External ID configuration', [
                 'authority' => $authority,
                 'client_id' => $clientId,
-                'tenant_name' => $tenantName
+                'tenant_name' => $tenantName,
+                'policy' => $policy
             ]);
         } else {
             // B2B Configuration for agents/employees
@@ -117,8 +119,9 @@ function handle_authentication_callback() {
         
         if ($userType === 'customer') {
             $tenantName = $config['b2c']['tenant_name'];
-            // Following Woodgrove External ID pattern - use standard onmicrosoft.com endpoint  
-            $authority = "https://login.microsoftonline.com/$tenantName.onmicrosoft.com/v2.0";
+            $policy = $config['b2c']['policy_signup_signin'];
+            // External ID uses policy-specific authority format
+            $authority = "https://$tenantName.ciamlogin.com/$tenantName.onmicrosoft.com/$policy/v2.0";
             $clientId = $config['b2c']['client_id'];
             $clientSecret = $config['b2c']['client_secret'];
         } else {
