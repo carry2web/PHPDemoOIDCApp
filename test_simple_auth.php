@@ -9,6 +9,14 @@ error_reporting(E_ALL);
 start_azure_safe_session();
 $logger = ScapeLogger::getInstance();
 
+// Handle authentication FIRST - before any HTML output
+if (isset($_GET['auth'])) {
+    $userType = $_GET['auth'];
+    // This will redirect immediately - no HTML output allowed before this
+    start_authentication($userType);
+    exit; // Should never reach here
+}
+
 // Test the OIDC configuration
 echo "<h1>Simple Authentication Test</h1>";
 
@@ -42,27 +50,6 @@ try {
 echo "<h2>3. Test Authentication</h2>";
 echo "<a href='?auth=customer' style='padding: 10px; background: blue; color: white; text-decoration: none; margin: 5px;'>Test Customer Login</a>";
 echo "<a href='?auth=agent' style='padding: 10px; background: green; color: white; text-decoration: none; margin: 5px;'>Test Agent Login</a>";
-
-// Handle authentication test
-if (isset($_GET['auth'])) {
-    $userType = $_GET['auth'];
-    echo "<br><br>Starting authentication for: $userType<br>";
-    
-    // Show the OIDC configuration before authentication
-    try {
-        $oidc = get_oidc_client($userType);
-        echo "OIDC Provider URL: " . $oidc->getProviderURL() . "<br>";
-        echo "Redirect URL: " . $oidc->getRedirectURL() . "<br>";
-        echo "Client ID: " . (strlen($oidc->getClientID()) > 10 ? substr($oidc->getClientID(), 0, 10) . "..." : $oidc->getClientID()) . "<br>";
-        echo "About to call authenticate()...<br>";
-        flush(); // Force output before redirect
-    } catch (Exception $e) {
-        echo "Error creating OIDC client: " . $e->getMessage() . "<br>";
-    }
-    
-    start_authentication($userType);
-    echo "If you see this, authenticate() didn't redirect properly<br>";
-}
 
 // Show callback info if we're in callback
 if (isset($_GET['code'])) {
