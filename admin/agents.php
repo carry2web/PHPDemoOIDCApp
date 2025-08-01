@@ -23,37 +23,32 @@ if (!empty($configErrors)) {
 }
 
 // Entra ID Admin Authentication (replaces password-based auth)
-if (!isset($_SESSION['admin_authenticated'])) {
-    $logger->info('Admin panel access attempt - checking authentication');
-    
-    // Check if user is already logged in with OIDC
-    if (isset($_SESSION['user_info'])) {
-        $userInfo = $_SESSION['user_info'];
-        $logger->debug('User already authenticated, checking admin role', ['user' => $userInfo['email'] ?? 'unknown']);
-        
-        // Check if user has admin role
-        if (hasAdminRole($userInfo)) {
-            $_SESSION['admin_authenticated'] = true;
-            $_SESSION['admin_user'] = $userInfo;
-            $logger->info('Admin access granted based on Entra ID role', [
-                'user' => $userInfo['email'] ?? 'unknown',
-                'roles' => $userInfo['roles'] ?? []
-            ]);
-        } else {
-            $logger->warning('Admin access denied - insufficient permissions', [
-                'user' => $userInfo['email'] ?? 'unknown',
-                'roles' => $userInfo['roles'] ?? []
-            ]);
-            showAccessDenied();
-            exit;
-        }
-    } else {
-        // Redirect to OIDC login for admin authentication
-        $logger->info('Redirecting to admin OIDC authentication');
-        redirectToAdminLogin();
-        exit;
-    }
+if (!isset($_SESSION['email']) || !isset($_SESSION['authenticated_at'])) {
+    $logger->info('Admin panel access attempt - no OIDC authentication found');
+    header('Location: ../index.php?login=1&type=agent');
+    exit;
 }
+
+// Check if user has admin/agent role
+$userType = $_SESSION['user_type'] ?? '';
+$userRole = $_SESSION['role'] ?? '';
+
+if ($userType !== 'agent' && $userRole !== 'admin') {
+    $logger->warning('Admin panel access denied - insufficient privileges', [
+        'user_type' => $userType,
+        'role' => $userRole,
+        'email' => $_SESSION['email'] ?? 'unknown'
+    ]);
+    die("Access denied. Admin privileges required.");
+}
+
+$_SESSION['admin_authenticated'] = true; // Set for compatibility
+$_SESSION['admin_user'] = [
+    'email' => $_SESSION['email'],
+    'name' => $_SESSION['name'] ?? '',
+    'roles' => [$userRole]
+];
+$logger->info('Admin panel access granted', ['email' => $_SESSION['email']]);
 
 // Check for logout
 if (isset($_POST['logout']) || isset($_GET['logout'])) {

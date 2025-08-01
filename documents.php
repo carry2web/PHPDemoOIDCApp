@@ -9,14 +9,21 @@ require_once 'lib/security_helper.php';
 $logger = ScapeLogger::getInstance();
 $security = SecurityHelper::getInstance();
 
-// Check if user is logged in
-if (!isset($_SESSION['scape_user'])) {
-    header('Location: index.php');
+// Check if user is logged in (check OIDC authentication)
+if (!isset($_SESSION['email']) || !isset($_SESSION['authenticated_at'])) {
+    header('Location: index.php?login=1&type=customer');
     exit;
 }
 
-$user = $_SESSION['scape_user'];
-$userType = isset($user['user_type']) ? $user['user_type'] : 'customer';
+// Create scape_user array from OIDC session for compatibility
+$user = [
+    'email' => $_SESSION['email'],
+    'name' => $_SESSION['name'] ?? '',
+    'user_type' => $_SESSION['user_type'] ?? 'customer'
+];
+$_SESSION['scape_user'] = $user; // Set for compatibility
+
+$userType = $user['user_type'];
 
 // Handle file upload and delete operations
 $uploadResult = null;
