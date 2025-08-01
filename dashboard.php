@@ -20,12 +20,17 @@ $roles = $_SESSION['roles'] ?? [];
 $claims = $_SESSION['claims'] ?? null;
 $id_token = $_SESSION['id_token'] ?? '';
 
-$logger->debug('Dashboard session data loaded', [
+$logger->info('Dashboard session data loaded', [
     'email' => $email,
     'user_type' => $userType,
     'user_role' => $userRole,
-    'is_guest_agent' => $isGuestAgent,
-    'is_scape_employee' => $isScapeEmployee
+    'has_session_variables' => [
+        'email' => isset($_SESSION['email']),
+        'name' => isset($_SESSION['name']),
+        'user_type' => isset($_SESSION['user_type']),
+        'user_role' => isset($_SESSION['user_role']),
+        'entra_user_type' => isset($_SESSION['entra_user_type'])
+    ]
 ]);
 
 // Generate status message
@@ -45,23 +50,31 @@ if ($userType === 'agent') {
     $statusMessage = 'Customer';
 }
 
-// Get AWS credentials (refresh if expired)
+// Get AWS credentials (refresh if expired) - SIMPLIFIED FOR DEBUG
 $awsCredentials = null;
-if (isset($_SESSION['aws_credentials']) && time() < $_SESSION['aws_expiry']) {
-    $awsCredentials = $_SESSION['aws_credentials'];
-} else {
-    // Refresh AWS credentials
-    $awsCredentials = get_aws_credentials($userRole, $email);
-    if ($awsCredentials) {
-        $_SESSION['aws_credentials'] = $awsCredentials;
-        $_SESSION['aws_expiry'] = time() + 3600;
-    }
-}
-
-// Get available PDFs
 $availablePdfs = [];
-if ($awsCredentials) {
-    $availablePdfs = list_available_pdfs($userRole, $awsCredentials);
+
+try {
+    if (isset($_SESSION['aws_credentials']) && time() < $_SESSION['aws_expiry']) {
+        $awsCredentials = $_SESSION['aws_credentials'];
+    } else {
+        // Refresh AWS credentials - only if function exists
+        if (function_exists('get_aws_credentials')) {
+            $awsCredentials = get_aws_credentials($userRole, $email);
+            if ($awsCredentials) {
+                $_SESSION['aws_credentials'] = $awsCredentials;
+                $_SESSION['aws_expiry'] = time() + 3600;
+            }
+        }
+    }
+
+    // Get available PDFs - only if function exists
+    if ($awsCredentials && function_exists('list_available_pdfs')) {
+        $availablePdfs = list_available_pdfs($userRole, $awsCredentials);
+    }
+} catch (Exception $e) {
+    $logger->error('AWS integration failed', ['error' => $e->getMessage()]);
+    // Continue without AWS functionality
 }
 
 ?>

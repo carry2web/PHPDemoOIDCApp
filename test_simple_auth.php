@@ -59,7 +59,7 @@ if (isset($_GET['code'])) {
     if (handle_authentication_callback()) {
         echo "✅ Authentication successful!<br>";
         echo "User: " . ($_SESSION['email'] ?? 'unknown') . "<br>";
-        echo "Role: " . ($_SESSION['role'] ?? 'unknown') . "<br>";
+        echo "Role: " . ($_SESSION['user_role'] ?? 'unknown') . "<br>";
         echo "<a href='dashboard.php'>Go to Dashboard</a>";
     } else {
         echo "❌ Authentication failed<br>";

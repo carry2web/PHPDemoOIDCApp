@@ -211,9 +211,16 @@ function handle_authentication_callback() {
             $_SESSION['claims'] = json_encode($claims);
             $_SESSION['authenticated_at'] = time();
             
-            // Simple role determination
+            // Set role variables that dashboard expects
             $role = ($userType === 'agent') ? 'agent' : 'customer';
-            $_SESSION['role'] = $role;
+            $_SESSION['user_role'] = $role; // Primary role variable
+            
+            // Set additional variables dashboard expects
+            $_SESSION['entra_user_type'] = 'Member'; // External ID users are always Members
+            $_SESSION['is_guest_agent'] = false; // Customers are never guest agents
+            $_SESSION['is_scape_employee'] = false; // Customers are never employees
+            $_SESSION['roles'] = []; // No specific roles for customers
+            $_SESSION['id_token'] = ''; // Not needed for basic flow
             
             $logger->info('User session created', [
                 'email' => $_SESSION['email'],

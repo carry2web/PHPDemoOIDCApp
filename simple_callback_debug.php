@@ -66,6 +66,7 @@ try {
         $_SESSION['email'] = $claims->email ?? '';
         $_SESSION['name'] = $claims->name ?? '';
         $_SESSION['user_type'] = $userType;
+        $_SESSION['user_role'] = ($userType === 'agent') ? 'agent' : 'customer';
         $_SESSION['authenticated_at'] = time();
         
         echo "<h2>SUCCESS! User authenticated</h2>";

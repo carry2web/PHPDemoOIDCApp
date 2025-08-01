@@ -29,6 +29,8 @@ ensure_authenticated();
 $env = parse_ini_file(__DIR__ . '/.env');
 $email = $_SESSION['email'] ?? 'onbekend';
 $name = $_SESSION['name'] ?? 'gebruiker';
+$userType = $_SESSION['user_type'] ?? 'customer';
+$userRole = $_SESSION['user_role'] ?? 'customer';
 $roles = $_SESSION['roles'] ?? [];
 
 echo "<h1>Welkom, " . htmlspecialchars($name) . "</h1>";
