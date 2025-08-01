@@ -143,7 +143,7 @@
 ### ✅ Documentation
 - [x] **Setup guide created**: SETUP_GUIDE.md
 - [x] **Deployment checklist**: This file
-- [x] **Environment template**: .env.template
+- [x] **Environment template**: .env.example
 - [ ] **User guide** for customers and agents
 - [ ] **Admin guide** for managing applications
 

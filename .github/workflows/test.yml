@@ -47,7 +47,7 @@ jobs:
         test -f lib/email_helper.php || (echo "❌ Missing lib/email_helper.php" && exit 1)
         
         # Configuration files
-        test -f .env.template || (echo "❌ Missing .env.template" && exit 1)
+        test -f .env.example || (echo "❌ Missing .env.example" && exit 1)
         test -f composer.json || (echo "❌ Missing composer.json" && exit 1)
         
         # Admin files
