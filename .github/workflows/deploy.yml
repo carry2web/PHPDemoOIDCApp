@@ -6,7 +6,8 @@ on:
   workflow_dispatch:
 
 env:
-  AZURE_WEBAPP_NAME: scapecustomers-hvhpchb9hwc6e5cb
+  AZURE_WEBAPP_NAME: scapecustomers
+  AZURE_RESOURCE_GROUP: customers
   PHP_VERSION: '8.2'
 
 jobs:
@@ -27,9 +28,13 @@ jobs:
     - name: Install dependencies
       run: composer install --prefer-dist --no-progress --no-dev --optimize-autoloader
 
+    - name: Login to Azure
+      uses: azure/login@v1
+      with:
+        creds: ${{ secrets.AZURE_CREDENTIALS }}
+
     - name: Deploy to Azure Web App
       uses: azure/webapps-deploy@v3
       with:
-        app-name: ${{ env.AZURE_WEBAPP_NAME }}
-        publish-profile: ${{ secrets.AZURE_WEBAPP_PUBLISH_PROFILE }}
+        app-name: scapecustomers
         package: .
