@@ -203,13 +203,14 @@ echo "</div>";
 // Test 8: Network connectivity
 echo "<div class='section'>";
 echo "<h2>🌐 Network Connectivity</h2>";
-$testUrls = [
+
+// Test basic endpoints with HEAD requests
+$basicUrls = [
     'https://login.microsoftonline.com' => [200, 301, 302],
-    'https://graph.microsoft.com/v1.0/$metadata' => [200],  // Proper Graph API endpoint
     'https://sts.windows.net' => [200, 301, 302]
 ];
 
-foreach ($testUrls as $url => $validCodes) {
+foreach ($basicUrls as $url => $validCodes) {
     $ch = curl_init();
     curl_setopt($ch, CURLOPT_URL, $url);
     curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
@@ -227,9 +228,35 @@ foreach ($testUrls as $url => $validCodes) {
     }
 }
 
-// Add note about Graph API 405 error
+// Test Graph API with a proper GET request to a valid endpoint
+$graphUrl = 'https://graph.microsoft.com/v1.0/$metadata';
+$ch = curl_init();
+curl_setopt($ch, CURLOPT_URL, $graphUrl);
+curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+curl_setopt($ch, CURLOPT_TIMEOUT, 5);
+curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
+curl_setopt($ch, CURLOPT_HTTPHEADER, [
+    'Accept: application/xml',
+    'User-Agent: Azure-Debug-Script'
+]);
+
+$result = curl_exec($ch);
+$httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+$curlError = curl_error($ch);
+curl_close($ch);
+
+if ($httpCode === 200) {
+    echo "<div class='success'>✅ $graphUrl (HTTP $httpCode)</div>";
+} else {
+    echo "<div class='error'>❌ $graphUrl (HTTP $httpCode)</div>";
+    if (!empty($curlError)) {
+        echo "<div class='info'>🔍 cURL Error: $curlError</div>";
+    }
+}
+
+// Add note about Graph API connectivity
 echo "<div class='info'>";
-echo "<strong>ℹ️ Note:</strong> HTTP 405 on https://graph.microsoft.com root is normal - Graph API requires specific endpoints.";
+echo "<strong>ℹ️ Note:</strong> Graph API \$metadata endpoint should return HTTP 200. If you see 405, this might indicate connectivity issues or Azure firewall restrictions.";
 echo "</div>";
 echo "</div>";
 
