@@ -3,16 +3,16 @@
 ini_set('display_errors', 1);
 error_reporting(E_ALL);
 
-echo "<h1>Callback Debug</h1>";
-
 // Basic includes
 require_once __DIR__ . '/vendor/autoload.php';
 require_once __DIR__ . '/lib/config_helper.php';
 
 use Jumbojett\OpenIDConnectClient;
 
-// Start session
+// Start session FIRST before any output
 session_start();
+
+echo "<h1>Callback Debug</h1>";
 
 echo "<h2>1. Session Data</h2>";
 echo "<pre>" . print_r($_SESSION, true) . "</pre>";
