@@ -1,0 +1,33 @@
+[2025-08-02 01:02:35] DEBUG: Loading application configuration []
+[2025-08-02 01:02:35] DEBUG: Configuration loaded successfully {"has_b2c_config":true,"has_b2b_config":true,"has_graph_config":true,"has_aws_config":true,"debug_mode":true}
+[2025-08-02 01:02:35] DEBUG: PHP error logging configured {"log_file":"/tmp/scape_travel.log"}
+[2025-08-02 01:03:02] DEBUG: Loading application configuration []
+[2025-08-02 01:03:02] DEBUG: Configuration loaded successfully {"has_b2c_config":true,"has_b2b_config":true,"has_graph_config":true,"has_aws_config":true,"debug_mode":true}
+[2025-08-02 01:03:02] DEBUG: PHP error logging configured {"log_file":"/tmp/scape_travel.log"}
+[2025-08-02 01:03:57] DEBUG: Loading application configuration []
+[2025-08-02 01:03:57] DEBUG: Configuration loaded successfully {"has_b2c_config":true,"has_b2b_config":true,"has_graph_config":true,"has_aws_config":true,"debug_mode":true}
+[2025-08-02 01:03:57] DEBUG: PHP error logging configured {"log_file":"/tmp/scape_travel.log"}
+[2025-08-02 01:07:32] DEBUG: Loading application configuration []
+[2025-08-02 01:07:32] DEBUG: Configuration loaded successfully {"has_b2c_config":true,"has_b2b_config":true,"has_graph_config":true,"has_aws_config":true,"debug_mode":true}
+[2025-08-02 01:07:32] DEBUG: PHP error logging configured {"log_file":"/tmp/scape_travel.log"}
+[2025-08-02 01:07:32] DEBUG: Available claims for role determination {"user_type":"customer","claims":"{\n    \"email\": \"test@example.com\",\n    \"name\": \"Test User\",\n    \"userType\": \"Member\"\n}"}
+[2025-08-02 01:07:32] DEBUG: Available claims for role determination {"user_type":"agent","claims":"{\n    \"email\": \"test@example.com\",\n    \"name\": \"Test User\",\n    \"userType\": \"Member\"\n}"}
+[2025-08-02 01:08:11] DEBUG: Loading application configuration []
+[2025-08-02 01:08:11] DEBUG: Configuration loaded successfully {"has_b2c_config":true,"has_b2b_config":true,"has_graph_config":true,"has_aws_config":true,"debug_mode":true}
+[2025-08-02 01:08:11] DEBUG: PHP error logging configured {"log_file":"/tmp/scape_travel.log"}
+[2025-08-02 01:08:56] DEBUG: Loading application configuration []
+[2025-08-02 01:08:56] DEBUG: Configuration loaded successfully {"has_b2c_config":true,"has_b2b_config":true,"has_graph_config":true,"has_aws_config":true,"debug_mode":true}
+[2025-08-02 01:08:56] DEBUG: PHP error logging configured {"log_file":"/tmp/scape_travel.log"}
+[2025-08-02 01:08:56] DEBUG: Available claims for role determination {"user_type":"customer","claims":"{\n    \"email\": \"test@external.com\"\n}"}
+[2025-08-02 01:08:56] DEBUG: Available claims for role determination {"user_type":"agent","claims":"{\n    \"email\": \"emp@scape.com.au\",\n    \"userType\": \"Member\"\n}"}
+[2025-08-02 01:08:56] DEBUG: Available claims for role determination {"user_type":"agent","claims":"{\n    \"email\": \"guest@external.com\",\n    \"userType\": \"Guest\"\n}"}
+[2025-08-02 01:08:56] DEBUG: Available claims for role determination {"user_type":"agent","claims":"{\n    \"email\": \"admin@scape.com.au\",\n    \"roles\": [\n        \"Admin\"\n    ]\n}"}
+[2025-08-02 01:09:19] DEBUG: Loading application configuration []
+[2025-08-02 01:09:19] DEBUG: Configuration loaded successfully {"has_b2c_config":true,"has_b2b_config":true,"has_graph_config":true,"has_aws_config":true,"debug_mode":true}
+[2025-08-02 01:09:19] DEBUG: PHP error logging configured {"log_file":"/tmp/scape_travel.log"}
+[2025-08-02 01:09:21] DEBUG: Loading application configuration []
+[2025-08-02 01:09:21] DEBUG: Configuration loaded successfully {"has_b2c_config":true,"has_b2b_config":true,"has_graph_config":true,"has_aws_config":true,"debug_mode":true}
+[2025-08-02 01:09:21] DEBUG: PHP error logging configured {"log_file":"/tmp/scape_travel.log"}
+[2025-08-02 01:09:23] DEBUG: Loading application configuration []
+[2025-08-02 01:09:23] DEBUG: Configuration loaded successfully {"has_b2c_config":true,"has_b2b_config":true,"has_graph_config":true,"has_aws_config":true,"debug_mode":true}
+[2025-08-02 01:09:23] DEBUG: PHP error logging configured {"log_file":"/tmp/scape_travel.log"}

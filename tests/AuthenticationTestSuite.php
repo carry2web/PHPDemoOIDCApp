@@ -291,6 +291,27 @@ class AuthenticationTestSuite {
         }
         echo "</div>";
     }
+    
+    // Individual test runners for CLI
+    public function testConfigurationOnly() {
+        $this->testConfigurationLoading();
+        $this->testTenantConfiguration();
+        $this->testRedirectUriConfiguration();
+        $this->displayResults();
+    }
+    
+    public function testOidcOnly() {
+        $this->testOidcClientCreation();
+        $this->testAuthorityUrls();
+        $this->testScopeConfiguration();
+        $this->displayResults();
+    }
+    
+    public function testSessionOnly() {
+        $this->testSessionVariableConsistency();
+        $this->testSessionSecurity();
+        $this->displayResults();
+    }
 }
 
 // Run tests if accessed directly
