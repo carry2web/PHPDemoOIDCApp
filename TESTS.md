@@ -283,7 +283,7 @@ Tests individual system components:
 Test different user scenarios:
 
 #### Employee Agent
-- Email: `employee@scape.com.au`
+- Email: `employee@s-capepartners.eu`
 - Expected: `user_role = 'agent'`, `is_scape_employee = true`
 
 #### Guest Agent (B2B)

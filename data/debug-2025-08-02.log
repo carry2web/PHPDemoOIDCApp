@@ -31,3 +31,17 @@
 [2025-08-02 01:09:23] DEBUG: Loading application configuration []
 [2025-08-02 01:09:23] DEBUG: Configuration loaded successfully {"has_b2c_config":true,"has_b2b_config":true,"has_graph_config":true,"has_aws_config":true,"debug_mode":true}
 [2025-08-02 01:09:23] DEBUG: PHP error logging configured {"log_file":"/tmp/scape_travel.log"}
+[2025-08-02 01:16:45] DEBUG: Loading application configuration []
+[2025-08-02 01:16:45] DEBUG: Configuration loaded successfully {"has_b2c_config":true,"has_b2b_config":true,"has_graph_config":true,"has_aws_config":true,"debug_mode":true}
+[2025-08-02 01:16:45] DEBUG: PHP error logging configured {"log_file":"/tmp/scape_travel.log"}
+[2025-08-02 01:16:45] DEBUG: Available claims for role determination {"user_type":"customer","claims":"{\n    \"email\": \"test@external.com\"\n}"}
+[2025-08-02 01:16:45] DEBUG: Available claims for role determination {"user_type":"agent","claims":"{\n    \"email\": \"emp@scape.com.au\",\n    \"userType\": \"Member\"\n}"}
+[2025-08-02 01:16:45] DEBUG: Available claims for role determination {"user_type":"agent","claims":"{\n    \"email\": \"guest@external.com\",\n    \"userType\": \"Guest\"\n}"}
+[2025-08-02 01:16:45] DEBUG: Available claims for role determination {"user_type":"agent","claims":"{\n    \"email\": \"admin@scape.com.au\",\n    \"roles\": [\n        \"Admin\"\n    ]\n}"}
+[2025-08-02 10:57:27] DEBUG: Loading application configuration []
+[2025-08-02 10:57:27] DEBUG: Configuration loaded successfully {"has_b2c_config":true,"has_b2b_config":true,"has_graph_config":true,"has_aws_config":true,"debug_mode":true}
+[2025-08-02 10:57:27] DEBUG: PHP error logging configured {"log_file":"/tmp/scape_travel.log"}
+[2025-08-02 10:57:27] DEBUG: Available claims for role determination {"user_type":"customer","claims":"{\n    \"email\": \"test@external.com\"\n}"}
+[2025-08-02 10:57:27] DEBUG: Available claims for role determination {"user_type":"agent","claims":"{\n    \"email\": \"emp@s-capepartners.eu\",\n    \"userType\": \"Member\"\n}"}
+[2025-08-02 10:57:27] DEBUG: Available claims for role determination {"user_type":"agent","claims":"{\n    \"email\": \"guest@external.com\",\n    \"userType\": \"Guest\"\n}"}
+[2025-08-02 10:57:27] DEBUG: Available claims for role determination {"user_type":"agent","claims":"{\n    \"email\": \"ictsupport@s-capepartners.eu\",\n    \"roles\": [\n        \"Admin\"\n    ]\n}"}

@@ -75,7 +75,7 @@ This checklist ensures proper setup of the multi-tenant S-Cape Travel authentica
 - [ ] Verify consent status shows "Granted for [tenant]"
 
 ### Email Configuration
-- [ ] Verify admin email account exists: `admin@yourcompany.com`
+- [ ] Verify admin email account exists: `ictsupport@s-capepartners.eu`
 - [ ] Ensure mailbox is accessible and active
 - [ ] Test email sending permissions
 
@@ -117,7 +117,7 @@ GRAPH_TENANT_ID=your-graph-tenant-id
 
 # Email Configuration (Graph API)
 EMAIL_METHOD=graph
-ADMIN_EMAIL=admin@yourcompany.com
+ADMIN_EMAIL=ictsupport@s-capepartners.eu
 SMTP_PASSWORD=not-needed-using-graph-api
 
 # AWS Configuration

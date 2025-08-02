@@ -27,7 +27,7 @@ class AgentAuthTests {
         $agentTestScenarios = [
             [
                 'title' => 'Internal Employee Authentication',
-                'description' => 'Test with @scape.com.au email addresses',
+                'description' => 'Test with @s-capepartners.eu email addresses',
                 'test_url' => '../index.php?user_type=agent',
                 'expected' => [
                     'Should redirect to Microsoft organizational login',
@@ -131,7 +131,7 @@ class AgentAuthTests {
         echo "<div style='background: #fff3cd; padding: 15px; border-left: 4px solid #ffc107;'>";
         echo "<h4>Required Test Accounts</h4>";
         echo "<ul>";
-        echo "<li><strong>Internal Employee:</strong> An active @scape.com.au account</li>";
+        echo "<li><strong>Internal Employee:</strong> An active @s-capepartners.eu account</li>";
         echo "<li><strong>Guest User:</strong> External user invited to the B2B tenant</li>";
         echo "<li><strong>Admin User:</strong> Account with administrative privileges</li>";
         echo "<li><strong>Standard User:</strong> Regular employee without admin rights</li>";

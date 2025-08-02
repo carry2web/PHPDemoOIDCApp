@@ -18,13 +18,13 @@ $testUsers = [
         'user_role' => 'customer'
     ],
     'agent' => [
-        'email' => 'agent@scape.com.au',
+        'email' => 'agent@s-capepartners.eu',
         'name' => 'Test Agent',
         'user_type' => 'agent',
         'user_role' => 'agent'
     ],
     'admin' => [
-        'email' => 'carry.megens@scape.com.au',
+        'email' => 'ictsupport@s-capepartners.eu',
         'name' => 'Carry Admin',
         'user_type' => 'agent',
         'user_role' => 'admin'

@@ -16,12 +16,14 @@ $failed = 0;
 function test($name, $condition, $message = '') {
     global $passed, $failed;
     if ($condition) {
-        echo "✅ $name\n";
-        if ($message) echo "   $message\n";
+        echo "✅ \033[32m$name\033[0m";  // Green color in terminal
+        if ($message) echo "\n   💡 $message";
+        echo "\n";
         $passed++;
     } else {
-        echo "❌ $name\n";
-        if ($message) echo "   $message\n";
+        echo "❌ \033[31m$name\033[0m";  // Red color in terminal
+        if ($message) echo "\n   💥 $message";
+        echo "\n";
         $failed++;
     }
 }
@@ -68,9 +70,9 @@ echo "---------------------------\n";
 // Test role scenarios
 $testCases = [
     ['customer', (object)['email' => 'test@external.com'], 'customer'],
-    ['agent', (object)['email' => 'emp@scape.com.au', 'userType' => 'Member'], 'agent'],
+    ['agent', (object)['email' => 'emp@s-capepartners.eu', 'userType' => 'Member'], 'agent'],
     ['agent', (object)['email' => 'guest@external.com', 'userType' => 'Guest'], 'agent'],
-    ['agent', (object)['email' => 'admin@scape.com.au', 'roles' => ['Admin']], 'admin']
+    ['agent', (object)['email' => 'ictsupport@s-capepartners.eu', 'roles' => ['Admin']], 'admin']
 ];
 
 foreach ($testCases as [$userType, $claims, $expectedRole]) {
@@ -119,18 +121,18 @@ $total = $passed + $failed;
 $percentage = $total > 0 ? round(($passed / $total) * 100, 1) : 0;
 
 echo "Total Tests: $total\n";
-echo "Passed: ✅ $passed\n";
-echo "Failed: ❌ $failed\n";
-echo "Success Rate: $percentage%\n";
+echo "Passed: ✅ \033[32m$passed\033[0m\n";
+echo "Failed: ❌ \033[31m$failed\033[0m\n";
+echo "Success Rate: \033[33m$percentage%\033[0m\n";
 
 if ($percentage === 100.0) {
-    echo "\n🎉 ALL TESTS PASSED!\n";
+    echo "\n🎉 \033[32mALL TESTS PASSED!\033[0m\n";
     echo "Your OIDC authentication system is ready for testing.\n";
 } elseif ($percentage >= 80.0) {
-    echo "\n⚠️ MOSTLY WORKING\n";
+    echo "\n⚠️  \033[33mMOSTLY WORKING\033[0m\n";
     echo "Most tests passed. Review the failures above.\n";
 } else {
-    echo "\n🚨 NEEDS ATTENTION\n";
+    echo "\n🚨 \033[31mNEEDS ATTENTION\033[0m\n";
     echo "Several tests failed. Check configuration and setup.\n";
 }
 

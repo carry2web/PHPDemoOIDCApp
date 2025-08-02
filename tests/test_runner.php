@@ -137,7 +137,7 @@ session_start();
             
             <h4>Agent Authentication (B2B)</h4>
             <ul>
-                <li><strong>❓ Internal employees</strong> - @scape.com.au accounts</li>
+                <li><strong>❓ Internal employees</strong> - @s-capepartners.eu accounts</li>
                 <li><strong>❓ Guest users</strong> - External collaborators invited to tenant</li>
                 <li><strong>❓ Admin roles</strong> - Users with elevated permissions</li>
                 <li><strong>❓ Multi-factor authentication</strong> - MFA prompts and handling</li>

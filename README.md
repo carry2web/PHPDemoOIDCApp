@@ -172,7 +172,7 @@ AWS_ROLE_AGENT=arn:aws:iam::account:role/AgentRole
 
 # Application Settings
 REDIRECT_URI=https://your-domain.com/callback.php
-ADMIN_EMAIL=admin@your-domain.com
+ADMIN_EMAIL=ictsupport@s-capepartners.eu
 DEBUG=true
 ```
 
@@ -289,7 +289,7 @@ git push origin main  # Triggers automatic Azure deployment
 - **Debug Tools**: Built-in diagnostic tools for troubleshooting
 
 ### Business Contact
-- **Email**: admin@scape-travel.com
+- **Email**: ictsupport@s-capepartners.eu
 - **Company**: S-Cape Travel Partnership Program
 - **Platform**: Microsoft B2B/B2C Cross-tenant Authentication
 

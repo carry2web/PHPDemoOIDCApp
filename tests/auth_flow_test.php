@@ -66,7 +66,7 @@ $testScenarios = [
     [
         'name' => 'Employee Agent',
         'userType' => 'agent',
-        'claims' => (object)['email' => 'employee@scape.com.au', 'name' => 'S-Cape Employee', 'userType' => 'Member']
+        'claims' => (object)['email' => 'employee@s-capepartners.eu', 'name' => 'S-Cape Employee', 'userType' => 'Member']
     ],
     [
         'name' => 'Guest Agent (B2B)',
@@ -76,7 +76,7 @@ $testScenarios = [
     [
         'name' => 'Admin User',
         'userType' => 'agent',
-        'claims' => (object)['email' => 'admin@scape.com.au', 'name' => 'Admin User', 'roles' => ['Admin']]
+        'claims' => (object)['email' => 'ictsupport@s-capepartners.eu', 'name' => 'Admin User', 'roles' => ['Admin']]
     ]
 ];
 

@@ -176,7 +176,7 @@ function hasAdminRole($userInfo) {
     }
     
     // Fallback: check if user email matches admin email
-    $adminEmail = $_ENV['ADMIN_EMAIL'] ?? 'admin@scape-travel.com';
+    $adminEmail = $_ENV['ADMIN_EMAIL'] ?? 'ictsupport@s-capepartners.eu';
     if (isset($userInfo['email']) && $userInfo['email'] === $adminEmail) {
         return true;
     }
