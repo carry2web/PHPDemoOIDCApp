@@ -12,14 +12,16 @@ class AgentAuthTests {
     public function runTests() {
         echo "<h2>🏢 Agent Authentication Tests (B2B)</h2>";
         
-        // Get B2B configuration
+        // Get B2B configuration and company config
         $config = get_app_config();
+        $companyConfig = get_company_config();
         $b2bTenantId = $config['b2b']['tenant_id'];
         
         echo "<div style='background: #d1ecf1; padding: 15px; border-radius: 5px; margin-bottom: 20px;'>";
         echo "<h3>🔍 B2B Tenant Information</h3>";
         echo "<p><strong>Tenant ID:</strong> $b2bTenantId</p>";
         echo "<p><strong>Authority:</strong> https://login.microsoftonline.com/$b2bTenantId/v2.0</p>";
+        echo "<p><strong>Company Domain:</strong> {$companyConfig['domain']}</p>";
         echo "<p><strong>Expected Users:</strong> Employees and invited guests</p>";
         echo "</div>";
         
@@ -27,7 +29,7 @@ class AgentAuthTests {
         $agentTestScenarios = [
             [
                 'title' => 'Internal Employee Authentication',
-                'description' => 'Test with @s-capepartners.eu email addresses',
+                'description' => 'Test with @' . $companyConfig['domain'] . ' email addresses',
                 'test_url' => '../index.php?user_type=agent',
                 'expected' => [
                     'Should redirect to Microsoft organizational login',

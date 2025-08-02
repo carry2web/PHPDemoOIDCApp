@@ -4,10 +4,14 @@
  * Quick test to verify the new role-based system is working
  */
 
-require_once __DIR__ . '/lib/oidc.php';
-require_once __DIR__ . '/lib/document_manager.php';
+require_once __DIR__ . '/../lib/oidc.php';
+require_once __DIR__ . '/../lib/document_manager.php';
+require_once __DIR__ . '/../lib/config_helper.php';
 
 start_azure_safe_session();
+
+// Get company configuration for test emails
+$companyConfig = get_company_config();
 
 // Mock different user types for testing
 $testUsers = [
@@ -18,13 +22,13 @@ $testUsers = [
         'user_role' => 'customer'
     ],
     'agent' => [
-        'email' => 'agent@s-capepartners.eu',
+        'email' => $companyConfig['test_emails']['agent'],
         'name' => 'Test Agent',
         'user_type' => 'agent',
         'user_role' => 'agent'
     ],
     'admin' => [
-        'email' => 'ictsupport@s-capepartners.eu',
+        'email' => $companyConfig['admin_email'],
         'name' => 'Carry Admin',
         'user_type' => 'agent',
         'user_role' => 'admin'

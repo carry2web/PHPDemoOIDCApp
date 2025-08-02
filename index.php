@@ -80,6 +80,19 @@ if (isset($_GET['apply'])) {
     <div class="container">
         <h1>Welcome to S-Cape Travel Portal</h1>
         
+        <?php if (isset($_GET['logged_out'])): ?>
+            <div class="success-message">
+                ✅ You have been successfully logged out.
+                <?php if (isset($_GET['graph_logout'])): ?>
+                    <br>🔐 Microsoft Graph API logout completed - all refresh tokens revoked.
+                <?php endif; ?>
+                <?php if (isset($_GET['azure_logout'])): ?>
+                    <br>🌐 Azure/Microsoft logout completed.
+                <?php endif; ?>
+                <br>All session data has been cleared.
+            </div>
+        <?php endif; ?>
+        
         <?php if (isset($_GET['error']) || !empty($error_message)): ?>
             <div class="error-message">
                 <?php 

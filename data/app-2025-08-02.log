@@ -73,3 +73,93 @@
 [2025-08-02 10:57:27] DEBUG scape_app: Available claims for role determination {"user_type":"agent","claims":"{\n    \"email\": \"ictsupport@s-capepartners.eu\",\n    \"roles\": [\n        \"Admin\"\n    ]\n}"}
 [2025-08-02 10:57:27] INFO scape_app: Entra roles found {"user_type":"agent","email":"ictsupport@s-capepartners.eu","entra_roles":["Admin"]}
 [2025-08-02 10:57:27] INFO scape_app: Admin role detected {"user_type":"agent","email":"ictsupport@s-capepartners.eu","admin_role":"Admin"}
+[2025-08-02 10:58:18] DEBUG scape_app: Loading application configuration []
+[2025-08-02 10:58:18] DEBUG scape_app: Configuration loaded successfully {"has_b2c_config":true,"has_b2b_config":true,"has_graph_config":true,"has_aws_config":true,"debug_mode":true}
+[2025-08-02 10:58:18] INFO scape_app: Debug mode enabled, configuring PHP error reporting []
+[2025-08-02 10:58:18] DEBUG scape_app: PHP error logging configured {"log_file":"/tmp/scape_travel.log"}
+[2025-08-02 10:58:31] DEBUG scape_app: Loading application configuration []
+[2025-08-02 10:58:31] DEBUG scape_app: Configuration loaded successfully {"has_b2c_config":true,"has_b2b_config":true,"has_graph_config":true,"has_aws_config":true,"debug_mode":true}
+[2025-08-02 10:58:31] INFO scape_app: Debug mode enabled, configuring PHP error reporting []
+[2025-08-02 10:58:31] DEBUG scape_app: PHP error logging configured {"log_file":"/tmp/scape_travel.log"}
+[2025-08-02 10:58:31] DEBUG scape_app: Available claims for role determination {"user_type":"customer","claims":"{\n    \"email\": \"test@external.com\"\n}"}
+[2025-08-02 10:58:31] INFO scape_app: Entra roles found {"user_type":"customer","email":"test@external.com","entra_roles":[]}
+[2025-08-02 10:58:31] DEBUG scape_app: Available claims for role determination {"user_type":"agent","claims":"{\n    \"email\": \"emp@s-capepartners.eu\",\n    \"userType\": \"Member\"\n}"}
+[2025-08-02 10:58:31] INFO scape_app: Entra roles found {"user_type":"agent","email":"emp@s-capepartners.eu","entra_roles":[]}
+[2025-08-02 10:58:31] DEBUG scape_app: Available claims for role determination {"user_type":"agent","claims":"{\n    \"email\": \"ictsupport@s-capepartners.eu\",\n    \"roles\": [\n        \"Admin\"\n    ]\n}"}
+[2025-08-02 10:58:31] INFO scape_app: Entra roles found {"user_type":"agent","email":"ictsupport@s-capepartners.eu","entra_roles":["Admin"]}
+[2025-08-02 10:58:31] INFO scape_app: Admin role detected {"user_type":"agent","email":"ictsupport@s-capepartners.eu","admin_role":"Admin"}
+[2025-08-02 11:16:33] DEBUG scape_app: Loading application configuration []
+[2025-08-02 11:16:33] DEBUG scape_app: Configuration loaded successfully {"has_b2c_config":true,"has_b2b_config":true,"has_graph_config":true,"has_aws_config":true,"debug_mode":true}
+[2025-08-02 11:16:33] INFO scape_app: Debug mode enabled, configuring PHP error reporting []
+[2025-08-02 11:16:33] DEBUG scape_app: PHP error logging configured {"log_file":"/tmp/scape_travel.log"}
+[2025-08-02 11:16:33] DEBUG scape_app: Available claims for role determination {"user_type":"customer","claims":"{\n    \"email\": \"test@external.com\"\n}"}
+[2025-08-02 11:16:33] INFO scape_app: Entra roles found {"user_type":"customer","email":"test@external.com","entra_roles":[]}
+[2025-08-02 11:16:33] DEBUG scape_app: Available claims for role determination {"user_type":"agent","claims":"{\n    \"email\": \"employee@s-capepartners.eu\",\n    \"userType\": \"Member\"\n}"}
+[2025-08-02 11:16:33] INFO scape_app: Entra roles found {"user_type":"agent","email":"employee@s-capepartners.eu","entra_roles":[]}
+[2025-08-02 11:16:33] DEBUG scape_app: Available claims for role determination {"user_type":"agent","claims":"{\n    \"email\": \"guest@external.com\",\n    \"userType\": \"Guest\"\n}"}
+[2025-08-02 11:16:33] INFO scape_app: Entra roles found {"user_type":"agent","email":"guest@external.com","entra_roles":[]}
+[2025-08-02 11:16:33] DEBUG scape_app: Available claims for role determination {"user_type":"agent","claims":"{\n    \"email\": \"ictsupport@s-capepartners.eu\",\n    \"roles\": [\n        \"Admin\"\n    ]\n}"}
+[2025-08-02 11:16:33] INFO scape_app: Entra roles found {"user_type":"agent","email":"ictsupport@s-capepartners.eu","entra_roles":["Admin"]}
+[2025-08-02 11:16:33] INFO scape_app: Admin role detected {"user_type":"agent","email":"ictsupport@s-capepartners.eu","admin_role":"Admin"}
+[2025-08-02 11:16:44] DEBUG scape_app: Loading application configuration []
+[2025-08-02 11:16:44] DEBUG scape_app: Configuration loaded successfully {"has_b2c_config":true,"has_b2b_config":true,"has_graph_config":true,"has_aws_config":true,"debug_mode":true}
+[2025-08-02 11:16:44] INFO scape_app: Debug mode enabled, configuring PHP error reporting []
+[2025-08-02 11:16:44] DEBUG scape_app: PHP error logging configured {"log_file":"/tmp/scape_travel.log"}
+[2025-08-02 11:16:44] DEBUG scape_app: Available claims for role determination {"user_type":"customer","claims":"{\n    \"email\": \"test@external.com\"\n}"}
+[2025-08-02 11:16:44] INFO scape_app: Entra roles found {"user_type":"customer","email":"test@external.com","entra_roles":[]}
+[2025-08-02 11:16:44] DEBUG scape_app: Available claims for role determination {"user_type":"agent","claims":"{\n    \"email\": \"employee@s-capepartners.eu\",\n    \"userType\": \"Member\"\n}"}
+[2025-08-02 11:16:44] INFO scape_app: Entra roles found {"user_type":"agent","email":"employee@s-capepartners.eu","entra_roles":[]}
+[2025-08-02 11:16:44] DEBUG scape_app: Available claims for role determination {"user_type":"agent","claims":"{\n    \"email\": \"guest@external.com\",\n    \"userType\": \"Guest\"\n}"}
+[2025-08-02 11:16:44] INFO scape_app: Entra roles found {"user_type":"agent","email":"guest@external.com","entra_roles":[]}
+[2025-08-02 11:16:44] DEBUG scape_app: Available claims for role determination {"user_type":"agent","claims":"{\n    \"email\": \"ictsupport@s-capepartners.eu\",\n    \"roles\": [\n        \"Admin\"\n    ]\n}"}
+[2025-08-02 11:16:44] INFO scape_app: Entra roles found {"user_type":"agent","email":"ictsupport@s-capepartners.eu","entra_roles":["Admin"]}
+[2025-08-02 11:16:44] INFO scape_app: Admin role detected {"user_type":"agent","email":"ictsupport@s-capepartners.eu","admin_role":"Admin"}
+[2025-08-02 11:17:52] DEBUG scape_app: Loading application configuration []
+[2025-08-02 11:17:52] DEBUG scape_app: Configuration loaded successfully {"has_b2c_config":true,"has_b2b_config":true,"has_graph_config":true,"has_aws_config":true,"debug_mode":true}
+[2025-08-02 11:17:52] INFO scape_app: Debug mode enabled, configuring PHP error reporting []
+[2025-08-02 11:17:52] DEBUG scape_app: PHP error logging configured {"log_file":"/tmp/scape_travel.log"}
+[2025-08-02 11:17:52] DEBUG scape_app: Available claims for role determination {"user_type":"customer","claims":"{\n    \"email\": \"test@external.com\"\n}"}
+[2025-08-02 11:17:52] INFO scape_app: Entra roles found {"user_type":"customer","email":"test@external.com","entra_roles":[]}
+[2025-08-02 11:17:52] DEBUG scape_app: Available claims for role determination {"user_type":"agent","claims":"{\n    \"email\": \"employee@s-capepartners.eu\",\n    \"userType\": \"Member\"\n}"}
+[2025-08-02 11:17:52] INFO scape_app: Entra roles found {"user_type":"agent","email":"employee@s-capepartners.eu","entra_roles":[]}
+[2025-08-02 11:17:52] DEBUG scape_app: Available claims for role determination {"user_type":"agent","claims":"{\n    \"email\": \"guest@external.com\",\n    \"userType\": \"Guest\"\n}"}
+[2025-08-02 11:17:52] INFO scape_app: Entra roles found {"user_type":"agent","email":"guest@external.com","entra_roles":[]}
+[2025-08-02 11:17:52] DEBUG scape_app: Available claims for role determination {"user_type":"agent","claims":"{\n    \"email\": \"ictsupport@s-capepartners.eu\",\n    \"roles\": [\n        \"Admin\"\n    ]\n}"}
+[2025-08-02 11:17:52] INFO scape_app: Entra roles found {"user_type":"agent","email":"ictsupport@s-capepartners.eu","entra_roles":["Admin"]}
+[2025-08-02 11:17:52] INFO scape_app: Admin role detected {"user_type":"agent","email":"ictsupport@s-capepartners.eu","admin_role":"Admin"}
+[2025-08-02 11:19:44] DEBUG scape_app: Loading application configuration []
+[2025-08-02 11:19:44] DEBUG scape_app: Configuration loaded successfully {"has_b2c_config":true,"has_b2b_config":true,"has_graph_config":true,"has_aws_config":true,"debug_mode":true}
+[2025-08-02 11:19:44] INFO scape_app: Debug mode enabled, configuring PHP error reporting []
+[2025-08-02 11:19:44] DEBUG scape_app: PHP error logging configured {"log_file":"/tmp/scape_travel.log"}
+[2025-08-02 11:19:44] DEBUG scape_app: Available claims for role determination {"user_type":"customer","claims":"{\n    \"email\": \"test@external.com\"\n}"}
+[2025-08-02 11:19:44] INFO scape_app: Entra roles found {"user_type":"customer","email":"test@external.com","entra_roles":[]}
+[2025-08-02 11:19:44] DEBUG scape_app: Available claims for role determination {"user_type":"agent","claims":"{\n    \"email\": \"employee@s-capepartners.eu\",\n    \"userType\": \"Member\"\n}"}
+[2025-08-02 11:19:44] INFO scape_app: Entra roles found {"user_type":"agent","email":"employee@s-capepartners.eu","entra_roles":[]}
+[2025-08-02 11:19:44] DEBUG scape_app: Available claims for role determination {"user_type":"agent","claims":"{\n    \"email\": \"guest@external.com\",\n    \"userType\": \"Guest\"\n}"}
+[2025-08-02 11:19:44] INFO scape_app: Entra roles found {"user_type":"agent","email":"guest@external.com","entra_roles":[]}
+[2025-08-02 11:19:44] DEBUG scape_app: Available claims for role determination {"user_type":"agent","claims":"{\n    \"email\": \"ictsupport@s-capepartners.eu\",\n    \"roles\": [\n        \"Admin\"\n    ]\n}"}
+[2025-08-02 11:19:44] INFO scape_app: Entra roles found {"user_type":"agent","email":"ictsupport@s-capepartners.eu","entra_roles":["Admin"]}
+[2025-08-02 11:19:44] INFO scape_app: Admin role detected {"user_type":"agent","email":"ictsupport@s-capepartners.eu","admin_role":"Admin"}
+[2025-08-02 11:20:11] DEBUG scape_app: Loading application configuration []
+[2025-08-02 11:20:11] DEBUG scape_app: Configuration loaded successfully {"has_b2c_config":true,"has_b2b_config":true,"has_graph_config":true,"has_aws_config":true,"debug_mode":true}
+[2025-08-02 11:20:11] INFO scape_app: Debug mode enabled, configuring PHP error reporting []
+[2025-08-02 11:20:11] DEBUG scape_app: PHP error logging configured {"log_file":"/tmp/scape_travel.log"}
+[2025-08-02 11:20:11] DEBUG scape_app: Available claims for role determination {"user_type":"customer","claims":"{\n    \"email\": \"test@external.com\"\n}"}
+[2025-08-02 11:20:11] INFO scape_app: Entra roles found {"user_type":"customer","email":"test@external.com","entra_roles":[]}
+[2025-08-02 11:20:11] DEBUG scape_app: Available claims for role determination {"user_type":"agent","claims":"{\n    \"email\": \"employee@s-capepartners.eu\",\n    \"userType\": \"Member\"\n}"}
+[2025-08-02 11:20:11] INFO scape_app: Entra roles found {"user_type":"agent","email":"employee@s-capepartners.eu","entra_roles":[]}
+[2025-08-02 11:20:11] DEBUG scape_app: Available claims for role determination {"user_type":"agent","claims":"{\n    \"email\": \"guest@external.com\",\n    \"userType\": \"Guest\"\n}"}
+[2025-08-02 11:20:11] INFO scape_app: Entra roles found {"user_type":"agent","email":"guest@external.com","entra_roles":[]}
+[2025-08-02 11:20:11] DEBUG scape_app: Available claims for role determination {"user_type":"agent","claims":"{\n    \"email\": \"ictsupport@s-capepartners.eu\",\n    \"roles\": [\n        \"Admin\"\n    ]\n}"}
+[2025-08-02 11:20:11] INFO scape_app: Entra roles found {"user_type":"agent","email":"ictsupport@s-capepartners.eu","entra_roles":["Admin"]}
+[2025-08-02 11:20:11] INFO scape_app: Admin role detected {"user_type":"agent","email":"ictsupport@s-capepartners.eu","admin_role":"Admin"}
+[2025-08-02 11:54:03] DEBUG scape_app: Loading application configuration []
+[2025-08-02 11:54:03] DEBUG scape_app: Configuration loaded successfully {"has_b2c_config":true,"has_b2b_config":true,"has_graph_config":true,"has_aws_config":true,"debug_mode":true}
+[2025-08-02 11:54:03] INFO scape_app: Debug mode enabled, configuring PHP error reporting []
+[2025-08-02 11:54:03] DEBUG scape_app: PHP error logging configured {"log_file":"/tmp/scape_travel.log"}
+[2025-08-02 11:54:03] WARNING scape_app: session_started {"session_id":"73ic6b0nrq56a36miiim8np3qo","ip":"::1","user_agent":"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Code/1.102.2 Chrome/134.0.6998.205 Electron/35.6.0 Safari/537.36"}
+[2025-08-02 12:19:50] DEBUG scape_app: Loading application configuration []
+[2025-08-02 12:19:50] DEBUG scape_app: Configuration loaded successfully {"has_b2c_config":true,"has_b2b_config":true,"has_graph_config":true,"has_aws_config":true,"debug_mode":true}
+[2025-08-02 12:19:50] INFO scape_app: Debug mode enabled, configuring PHP error reporting []
+[2025-08-02 12:19:50] DEBUG scape_app: PHP error logging configured {"log_file":"/tmp/scape_travel.log"}
+[2025-08-02 12:19:50] WARNING scape_app: session_started {"session_id":"81li9rijf2prfhhv6tapskv2kq","ip":"::1","user_agent":"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Code/1.102.2 Chrome/134.0.6998.205 Electron/35.6.0 Safari/537.36"}

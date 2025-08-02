@@ -45,3 +45,53 @@
 [2025-08-02 10:57:27] DEBUG: Available claims for role determination {"user_type":"agent","claims":"{\n    \"email\": \"emp@s-capepartners.eu\",\n    \"userType\": \"Member\"\n}"}
 [2025-08-02 10:57:27] DEBUG: Available claims for role determination {"user_type":"agent","claims":"{\n    \"email\": \"guest@external.com\",\n    \"userType\": \"Guest\"\n}"}
 [2025-08-02 10:57:27] DEBUG: Available claims for role determination {"user_type":"agent","claims":"{\n    \"email\": \"ictsupport@s-capepartners.eu\",\n    \"roles\": [\n        \"Admin\"\n    ]\n}"}
+[2025-08-02 10:58:18] DEBUG: Loading application configuration []
+[2025-08-02 10:58:18] DEBUG: Configuration loaded successfully {"has_b2c_config":true,"has_b2b_config":true,"has_graph_config":true,"has_aws_config":true,"debug_mode":true}
+[2025-08-02 10:58:18] DEBUG: PHP error logging configured {"log_file":"/tmp/scape_travel.log"}
+[2025-08-02 10:58:31] DEBUG: Loading application configuration []
+[2025-08-02 10:58:31] DEBUG: Configuration loaded successfully {"has_b2c_config":true,"has_b2b_config":true,"has_graph_config":true,"has_aws_config":true,"debug_mode":true}
+[2025-08-02 10:58:31] DEBUG: PHP error logging configured {"log_file":"/tmp/scape_travel.log"}
+[2025-08-02 10:58:31] DEBUG: Available claims for role determination {"user_type":"customer","claims":"{\n    \"email\": \"test@external.com\"\n}"}
+[2025-08-02 10:58:31] DEBUG: Available claims for role determination {"user_type":"agent","claims":"{\n    \"email\": \"emp@s-capepartners.eu\",\n    \"userType\": \"Member\"\n}"}
+[2025-08-02 10:58:31] DEBUG: Available claims for role determination {"user_type":"agent","claims":"{\n    \"email\": \"ictsupport@s-capepartners.eu\",\n    \"roles\": [\n        \"Admin\"\n    ]\n}"}
+[2025-08-02 11:16:33] DEBUG: Loading application configuration []
+[2025-08-02 11:16:33] DEBUG: Configuration loaded successfully {"has_b2c_config":true,"has_b2b_config":true,"has_graph_config":true,"has_aws_config":true,"debug_mode":true}
+[2025-08-02 11:16:33] DEBUG: PHP error logging configured {"log_file":"/tmp/scape_travel.log"}
+[2025-08-02 11:16:33] DEBUG: Available claims for role determination {"user_type":"customer","claims":"{\n    \"email\": \"test@external.com\"\n}"}
+[2025-08-02 11:16:33] DEBUG: Available claims for role determination {"user_type":"agent","claims":"{\n    \"email\": \"employee@s-capepartners.eu\",\n    \"userType\": \"Member\"\n}"}
+[2025-08-02 11:16:33] DEBUG: Available claims for role determination {"user_type":"agent","claims":"{\n    \"email\": \"guest@external.com\",\n    \"userType\": \"Guest\"\n}"}
+[2025-08-02 11:16:33] DEBUG: Available claims for role determination {"user_type":"agent","claims":"{\n    \"email\": \"ictsupport@s-capepartners.eu\",\n    \"roles\": [\n        \"Admin\"\n    ]\n}"}
+[2025-08-02 11:16:44] DEBUG: Loading application configuration []
+[2025-08-02 11:16:44] DEBUG: Configuration loaded successfully {"has_b2c_config":true,"has_b2b_config":true,"has_graph_config":true,"has_aws_config":true,"debug_mode":true}
+[2025-08-02 11:16:44] DEBUG: PHP error logging configured {"log_file":"/tmp/scape_travel.log"}
+[2025-08-02 11:16:44] DEBUG: Available claims for role determination {"user_type":"customer","claims":"{\n    \"email\": \"test@external.com\"\n}"}
+[2025-08-02 11:16:44] DEBUG: Available claims for role determination {"user_type":"agent","claims":"{\n    \"email\": \"employee@s-capepartners.eu\",\n    \"userType\": \"Member\"\n}"}
+[2025-08-02 11:16:44] DEBUG: Available claims for role determination {"user_type":"agent","claims":"{\n    \"email\": \"guest@external.com\",\n    \"userType\": \"Guest\"\n}"}
+[2025-08-02 11:16:44] DEBUG: Available claims for role determination {"user_type":"agent","claims":"{\n    \"email\": \"ictsupport@s-capepartners.eu\",\n    \"roles\": [\n        \"Admin\"\n    ]\n}"}
+[2025-08-02 11:17:52] DEBUG: Loading application configuration []
+[2025-08-02 11:17:52] DEBUG: Configuration loaded successfully {"has_b2c_config":true,"has_b2b_config":true,"has_graph_config":true,"has_aws_config":true,"debug_mode":true}
+[2025-08-02 11:17:52] DEBUG: PHP error logging configured {"log_file":"/tmp/scape_travel.log"}
+[2025-08-02 11:17:52] DEBUG: Available claims for role determination {"user_type":"customer","claims":"{\n    \"email\": \"test@external.com\"\n}"}
+[2025-08-02 11:17:52] DEBUG: Available claims for role determination {"user_type":"agent","claims":"{\n    \"email\": \"employee@s-capepartners.eu\",\n    \"userType\": \"Member\"\n}"}
+[2025-08-02 11:17:52] DEBUG: Available claims for role determination {"user_type":"agent","claims":"{\n    \"email\": \"guest@external.com\",\n    \"userType\": \"Guest\"\n}"}
+[2025-08-02 11:17:52] DEBUG: Available claims for role determination {"user_type":"agent","claims":"{\n    \"email\": \"ictsupport@s-capepartners.eu\",\n    \"roles\": [\n        \"Admin\"\n    ]\n}"}
+[2025-08-02 11:19:44] DEBUG: Loading application configuration []
+[2025-08-02 11:19:44] DEBUG: Configuration loaded successfully {"has_b2c_config":true,"has_b2b_config":true,"has_graph_config":true,"has_aws_config":true,"debug_mode":true}
+[2025-08-02 11:19:44] DEBUG: PHP error logging configured {"log_file":"/tmp/scape_travel.log"}
+[2025-08-02 11:19:44] DEBUG: Available claims for role determination {"user_type":"customer","claims":"{\n    \"email\": \"test@external.com\"\n}"}
+[2025-08-02 11:19:44] DEBUG: Available claims for role determination {"user_type":"agent","claims":"{\n    \"email\": \"employee@s-capepartners.eu\",\n    \"userType\": \"Member\"\n}"}
+[2025-08-02 11:19:44] DEBUG: Available claims for role determination {"user_type":"agent","claims":"{\n    \"email\": \"guest@external.com\",\n    \"userType\": \"Guest\"\n}"}
+[2025-08-02 11:19:44] DEBUG: Available claims for role determination {"user_type":"agent","claims":"{\n    \"email\": \"ictsupport@s-capepartners.eu\",\n    \"roles\": [\n        \"Admin\"\n    ]\n}"}
+[2025-08-02 11:20:11] DEBUG: Loading application configuration []
+[2025-08-02 11:20:11] DEBUG: Configuration loaded successfully {"has_b2c_config":true,"has_b2b_config":true,"has_graph_config":true,"has_aws_config":true,"debug_mode":true}
+[2025-08-02 11:20:11] DEBUG: PHP error logging configured {"log_file":"/tmp/scape_travel.log"}
+[2025-08-02 11:20:11] DEBUG: Available claims for role determination {"user_type":"customer","claims":"{\n    \"email\": \"test@external.com\"\n}"}
+[2025-08-02 11:20:11] DEBUG: Available claims for role determination {"user_type":"agent","claims":"{\n    \"email\": \"employee@s-capepartners.eu\",\n    \"userType\": \"Member\"\n}"}
+[2025-08-02 11:20:11] DEBUG: Available claims for role determination {"user_type":"agent","claims":"{\n    \"email\": \"guest@external.com\",\n    \"userType\": \"Guest\"\n}"}
+[2025-08-02 11:20:11] DEBUG: Available claims for role determination {"user_type":"agent","claims":"{\n    \"email\": \"ictsupport@s-capepartners.eu\",\n    \"roles\": [\n        \"Admin\"\n    ]\n}"}
+[2025-08-02 11:54:03] DEBUG: Loading application configuration []
+[2025-08-02 11:54:03] DEBUG: Configuration loaded successfully {"has_b2c_config":true,"has_b2b_config":true,"has_graph_config":true,"has_aws_config":true,"debug_mode":true}
+[2025-08-02 11:54:03] DEBUG: PHP error logging configured {"log_file":"/tmp/scape_travel.log"}
+[2025-08-02 12:19:50] DEBUG: Loading application configuration []
+[2025-08-02 12:19:50] DEBUG: Configuration loaded successfully {"has_b2c_config":true,"has_b2b_config":true,"has_graph_config":true,"has_aws_config":true,"debug_mode":true}
+[2025-08-02 12:19:50] DEBUG: PHP error logging configured {"log_file":"/tmp/scape_travel.log"}

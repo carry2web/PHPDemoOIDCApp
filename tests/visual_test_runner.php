@@ -394,10 +394,13 @@ function runRoleTests() {
     echo "👥 Role Determination Tests\n";
     echo "===========================\n\n";
     
+    // Get company configuration for test emails
+    $companyConfig = get_company_config();
+    
     $testCases = [
         ['customer', (object)['email' => 'test@external.com'], 'customer'],
-        ['agent', (object)['email' => 'emp@s-capepartners.eu', 'userType' => 'Member'], 'agent'],
-        ['agent', (object)['email' => 'ictsupport@s-capepartners.eu', 'roles' => ['Admin']], 'admin']
+        ['agent', (object)['email' => $companyConfig['test_emails']['employee'], 'userType' => 'Member'], 'agent'],
+        ['agent', (object)['email' => $companyConfig['admin_email'], 'roles' => ['Admin']], 'admin']
     ];
     
     foreach ($testCases as [$userType, $claims, $expectedRole]) {

@@ -295,16 +295,22 @@ session_start();
                 
                 <div class="test-card">
                     <div class="test-card-header">
-                        <h3>🔄 Session Management</h3>
+                        <h3>🔄 Session Management & Logout</h3>
                     </div>
                     <div class="test-card-body">
-                        <p>Test session persistence and security:</p>
+                        <p>Test session persistence and logout security:</p>
                         <ul>
                             <li>Session timeout handling</li>
                             <li>Concurrent session management</li>
                             <li>Session security settings</li>
                             <li>Clean logout process</li>
+                            <li>Cookie clearing</li>
+                            <li>Azure signout integration</li>
                         </ul>
+                        <div style="margin-top: 10px;">
+                            <a href="test_logout.php" class="test-button info" target="_blank" style="margin-right: 5px;">🚪 Test Logout</a>
+                            <a href="session_cleanup.php" class="test-button warning" target="_blank">🧹 Session Cleanup</a>
+                        </div>
                         <button class="test-button" onclick="testSessionManagement()">Test Sessions</button>
                     </div>
                 </div>

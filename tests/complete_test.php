@@ -4,8 +4,17 @@
  * Comprehensive testing for your authentication system
  */
 
+// Initialize test environment (handles Xdebug and other settings)
+require_once __DIR__ . '/test_environment.php';
+
 require_once __DIR__ . '/../lib/config_helper.php';
 require_once __DIR__ . '/../lib/oidc.php';
+
+// Show test environment status
+$testEnv = TestEnvironment::getInstance();
+if ($testEnv->getConfig('show_debug_info')) {
+    $testEnv->showStatus();
+}
 
 echo "\n🔐 Complete OIDC Authentication Test Suite\n";
 echo "==========================================\n";
@@ -36,7 +45,9 @@ echo "----------------------\n";
 
 try {
     $config = get_app_config();
+    $companyConfig = get_company_config();
     test("Configuration Loading", !empty($config), "Configuration loaded successfully");
+    test("Company Config", !empty($companyConfig), "Company configuration loaded");
     test("B2C Config", isset($config['b2c']) && !empty($config['b2c']['client_id']), "B2C tenant configured");
     test("B2B Config", isset($config['b2b']) && !empty($config['b2b']['client_id']), "B2B tenant configured");
     test("App Config", isset($config['app']) && !empty($config['app']['redirect_uri']), "App configuration present");
@@ -67,12 +78,13 @@ try {
 echo "\n3. Role Determination Tests\n";
 echo "---------------------------\n";
 
-// Test role scenarios
+// Test role scenarios using environment-driven emails
+$companyConfig = get_company_config();
 $testCases = [
     ['customer', (object)['email' => 'test@external.com'], 'customer'],
-    ['agent', (object)['email' => 'emp@s-capepartners.eu', 'userType' => 'Member'], 'agent'],
+    ['agent', (object)['email' => $companyConfig['test_emails']['employee'], 'userType' => 'Member'], 'agent'],
     ['agent', (object)['email' => 'guest@external.com', 'userType' => 'Guest'], 'agent'],
-    ['agent', (object)['email' => 'ictsupport@s-capepartners.eu', 'roles' => ['Admin']], 'admin']
+    ['agent', (object)['email' => $companyConfig['test_emails']['admin'], 'roles' => ['Admin']], 'admin']
 ];
 
 foreach ($testCases as [$userType, $claims, $expectedRole]) {

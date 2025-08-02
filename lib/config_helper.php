@@ -201,4 +201,43 @@ function log_app_debug($message, $context = []) {
     $logger = ScapeLogger::getInstance();
     $logger->debug($message, $context);
 }
+
+/**
+ * Get company-specific configuration - Environment-driven approach
+ */
+function get_company_config() {
+    static $companyConfig = null;
+    
+    if ($companyConfig === null) {
+        // Load environment variables manually to handle quotes properly
+        $env = [];
+        if (file_exists(__DIR__ . '/../.env')) {
+            $lines = file(__DIR__ . '/../.env', FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
+            foreach ($lines as $line) {
+                $line = trim($line);
+                if (empty($line) || strpos($line, '#') === 0) continue;
+                
+                $parts = explode('=', $line, 2);
+                if (count($parts) === 2) {
+                    $key = trim($parts[0]);
+                    $value = trim($parts[1], "'\"");
+                    $env[$key] = $value;
+                }
+            }
+        }
+        
+        $companyConfig = [
+            'domain' => $env['COMPANY_DOMAIN'] ?? 's-capepartners.eu',
+            'admin_email' => $env['ADMIN_EMAIL'] ?? 'ictsupport@s-capepartners.eu',
+            'company_name' => $env['COMPANY_NAME'] ?? 'S-Cape Partners',
+            'test_emails' => [
+                'employee' => $env['TEST_EMPLOYEE_EMAIL'] ?? 'employee@s-capepartners.eu',
+                'admin' => $env['TEST_ADMIN_EMAIL'] ?? 'ictsupport@s-capepartners.eu',
+                'agent' => $env['TEST_AGENT_EMAIL'] ?? 'agent@s-capepartners.eu'
+            ]
+        ];
+    }
+    
+    return $companyConfig;
+}
 ?>

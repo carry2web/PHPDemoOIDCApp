@@ -7,6 +7,9 @@
 require_once __DIR__ . '/../lib/config_helper.php';
 require_once __DIR__ . '/../lib/oidc.php';
 
+// Get company configuration for test emails
+$companyConfig = get_company_config();
+
 echo "🔐 Authentication Flow Test\n";
 echo "===========================\n\n";
 
@@ -66,7 +69,7 @@ $testScenarios = [
     [
         'name' => 'Employee Agent',
         'userType' => 'agent',
-        'claims' => (object)['email' => 'employee@s-capepartners.eu', 'name' => 'S-Cape Employee', 'userType' => 'Member']
+        'claims' => (object)['email' => $companyConfig['test_emails']['employee'], 'name' => 'S-Cape Employee', 'userType' => 'Member']
     ],
     [
         'name' => 'Guest Agent (B2B)',
@@ -76,7 +79,7 @@ $testScenarios = [
     [
         'name' => 'Admin User',
         'userType' => 'agent',
-        'claims' => (object)['email' => 'ictsupport@s-capepartners.eu', 'name' => 'Admin User', 'roles' => ['Admin']]
+        'claims' => (object)['email' => $companyConfig['admin_email'], 'name' => 'Admin User', 'roles' => ['Admin']]
     ]
 ];
 
